@@ -1,0 +1,166 @@
+---
+title: Bulk lookup
+sidebar_label: POST /lookup/players/
+description: Look up to 250 players in one request.
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<div className="endpoint"><span className="method post">POST</span>/api/v1/lookup/players/</div>
+
+Look up to 250 players at once: the endpoint for leaderboards. Every name
+you send comes back with a `status`, so one unknown or private player never
+fails the request. It counts as one request against your
+[rate limit](../rate-limits.md).
+
+## Body
+
+```json
+{ "usernames": ["comet", "pebble", "marmot", "Tidepool", "ghostie"] }
+```
+
+| Field | Type | |
+|---|---|---|
+| `usernames` | array of strings, 1–250 | bonk.io usernames. Case doesn't matter; duplicates (ignoring case) are dropped. Each up to 100 characters |
+
+Send `Content-Type: application/json`.
+
+## Request
+
+<Tabs groupId="lang" queryString>
+<TabItem value="curl" label="curl">
+
+```bash
+curl https://bonkverse.io/api/v1/lookup/players/ \
+  -H "Authorization: Bearer $BONKVERSE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"usernames": ["comet", "pebble", "marmot", "Tidepool", "ghostie"]}'
+```
+
+</TabItem>
+<TabItem value="js" label="JavaScript">
+
+```js
+async function lookupPlayers(usernames) {
+  const res = await fetch("https://bonkverse.io/api/v1/lookup/players/", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.BONKVERSE_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ usernames }),
+  });
+  const body = await res.json();
+  if (!body.ok) throw new Error(body.error);
+  return body.data.players;
+}
+
+const players = await lookupPlayers(["comet", "pebble", "marmot", "Tidepool", "ghostie"]);
+for (const p of players) {
+  console.log(p.username, p.status, p.level?.value ?? "-");
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+import os
+import requests
+
+def lookup_players(usernames):
+    res = requests.post(
+        "https://bonkverse.io/api/v1/lookup/players/",
+        headers={"Authorization": f"Bearer {os.environ['BONKVERSE_API_KEY']}"},
+        json={"usernames": usernames},
+        timeout=30,
+    )
+    body = res.json()
+    if not body["ok"]:
+        raise RuntimeError(body["error"])
+    return body["data"]["players"]
+
+for p in lookup_players(["comet", "pebble", "marmot", "Tidepool", "ghostie"]):
+    print(p["username"], p["status"], (p["level"] or {}).get("value", "-"))
+```
+
+</TabItem>
+</Tabs>
+
+## Response
+
+```json
+{
+  "ok": true,
+  "data": {
+    "players": [
+      {
+        "requested": "comet",
+        "username": "Comet",
+        "status": "found",
+        "level": {
+          "value": 87,
+          "peak": 87,
+          "seen_at": "2026-11-08T03:00:00.000Z",
+          "seen_day": "2026-11-08",
+          "estimated": false,
+          "source": "replays",
+          "replay": { "cycle": 6, "id": "344124" }
+        },
+        "games": 4120,
+        "account": { "dbid": 9876543, "joined": "2019-06-02", "joined_estimated": true },
+        "bonkverse_account": false,
+        "profile_url": "https://bonkverse.io/player/Comet/"
+      },
+      {
+        "requested": "pebble",
+        "username": "pebble",
+        "status": "private",
+        "level": null,
+        "games": 2210,
+        "account": { "dbid": 2204811, "joined": "2016-11-30", "joined_estimated": true },
+        "bonkverse_account": true,
+        "profile_url": "https://bonkverse.io/player/pebble/"
+      },
+      {
+        "requested": "ghostie",
+        "username": "ghostie",
+        "status": "not_found",
+        "level": null,
+        "games": null,
+        "account": null,
+        "bonkverse_account": false,
+        "profile_url": null
+      }
+    ],
+    "counts": { "found": 1, "private": 1, "not_found": 1 }
+  }
+}
+```
+
+`players` is in the order you asked, one per unique name. Each is a
+[player object](player.mdx#the-player-object). `counts` totals the statuses.
+
+| `status` | Meaning | What to show |
+|---|---|---|
+| `found` | `level` is set | The level, with "last seen" from `seen_day` |
+| `private` | They hid their level on Bonkverse | The player, no level |
+| `not_found` | No replays for that name | Check the spelling you have for them |
+| `unavailable` | The replay archive didn't answer for this name | Keep what you had; try again next sync |
+
+Treat any `status` you don't recognise like `unavailable`.
+
+## Errors
+
+| Status | `error` | |
+|---|---|---|
+| 400 | `usernames_required` | `usernames` missing, empty or not a list |
+| 400 | `too_many_usernames` | Over 250; the reply includes `"max": 250` |
+| 400 | `invalid_username` | A name is empty, not a string, or over 100 characters |
+| 400 | `invalid_json` | The body isn't JSON |
+
+Plus the [errors every endpoint can return](../errors.md).
+
+Players are cached for about 5 minutes, so looking up the same list twice
+in a row is fast and doesn't load the replay archive.

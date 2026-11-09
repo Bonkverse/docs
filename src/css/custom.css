@@ -1,0 +1,262 @@
+/* Bonkverse developer docs theme.
+ *
+ * Same tokens as the replay site (ReplayRenderer browser/dev.css) so the
+ * docs read as part of Bonkverse: deep navy canvas, raised panels, bonk.io's
+ * own Futura PT, teal for actions, soft blue for links.
+ */
+
+@font-face {
+  font-family: 'Futura PT';
+  src: url('/fonts/fptbook.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Futura PT';
+  src: url('/fonts/fptmed.otf') format('opentype');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Futura PT';
+  src: url('/fonts/fptb.otf') format('opentype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --bv-canvas: #141f2b;
+  --bv-panel: #1c2d40;
+  --bv-panel-2: #22364c;
+  --bv-inset: #101a25;
+  --bv-outline: #354a5f;
+  --bv-text: #edf4fb;
+  --bv-muted: #aec1d3;
+  --bv-action: #47d8c4;
+  --bv-action-ink: #08201d;
+  --bv-action-tint: rgba(71, 216, 196, 0.12);
+  --bv-link: #90b7ff;
+  --bv-danger: #ff8a80;
+  --bv-gold: #ffc107;
+}
+
+/* The site is dark-only (colorMode.disableSwitch), so tokens go on both. */
+:root,
+[data-theme='dark'] {
+  --ifm-font-family-base: 'Futura PT', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ifm-heading-font-family: var(--ifm-font-family-base);
+  --ifm-font-family-monospace: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --ifm-font-size-base: 17px;
+  --ifm-line-height-base: 1.6;
+  --ifm-heading-font-weight: 500;
+  --ifm-font-weight-bold: 500;
+
+  --ifm-background-color: var(--bv-canvas);
+  --ifm-background-surface-color: var(--bv-panel);
+  --ifm-font-color-base: var(--bv-text);
+  --ifm-font-color-secondary: var(--bv-muted);
+  --ifm-color-content-secondary: var(--bv-muted);
+  --ifm-heading-color: var(--bv-text);
+
+  --ifm-color-primary: #47d8c4;
+  --ifm-color-primary-dark: #30d1bb;
+  --ifm-color-primary-darker: #2bc6b1;
+  --ifm-color-primary-darkest: #23a392;
+  --ifm-color-primary-light: #5edfcd;
+  --ifm-color-primary-lighter: #6ae1d1;
+  --ifm-color-primary-lightest: #8de8dc;
+
+  --ifm-link-color: var(--bv-link);
+  --ifm-link-hover-color: #b5cfff;
+  --ifm-link-hover-decoration: underline;
+
+  --ifm-navbar-background-color: rgba(20, 31, 43, 0.92);
+  --ifm-navbar-height: 60px;
+  --ifm-footer-background-color: var(--bv-inset);
+  --ifm-toc-border-color: var(--bv-outline);
+  --ifm-hr-border-color: var(--bv-outline);
+  --ifm-table-border-color: var(--bv-outline);
+  --ifm-table-stripe-background: rgba(255, 255, 255, 0.02);
+  --ifm-table-head-background: var(--bv-panel);
+
+  --ifm-menu-color: var(--bv-muted);
+  --ifm-menu-color-active: var(--bv-action);
+  --ifm-menu-color-background-active: var(--bv-action-tint);
+  --ifm-menu-color-background-hover: rgba(255, 255, 255, 0.04);
+
+  --ifm-code-background: var(--bv-inset);
+  --ifm-code-border-radius: 6px;
+  --ifm-code-font-size: 88%;
+  --prism-background-color: var(--bv-inset);
+  --docusaurus-highlighted-code-line-bg: rgba(71, 216, 196, 0.1);
+
+  --ifm-global-radius: 8px;
+  --ifm-card-border-radius: 12px;
+  --ifm-tabs-color-active: var(--bv-action);
+  --ifm-tabs-color-active-border: var(--bv-action);
+
+  --ifm-color-info-contrast-background: #172b44;
+  --ifm-color-info-dark: var(--bv-link);
+  --ifm-color-warning-contrast-background: #33290f;
+  --ifm-color-warning-dark: var(--bv-gold);
+  --ifm-color-danger-contrast-background: #3a1d1d;
+  --ifm-color-danger-dark: var(--bv-danger);
+  --ifm-color-success-contrast-background: #10302c;
+  --ifm-color-success-dark: var(--bv-action);
+}
+
+body {
+  background: radial-gradient(1200px 600px at 10% -10%, #1a3448 0%, var(--bv-canvas) 55%) fixed,
+    var(--bv-canvas);
+}
+
+.navbar {
+  border-bottom: 1px solid var(--bv-outline);
+  backdrop-filter: blur(8px);
+  box-shadow: none;
+}
+.navbar__title {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.navbar__logo img {
+  border-radius: 50%;
+}
+
+/* Docs body */
+.markdown h1 {
+  font-size: 2.4rem;
+  letter-spacing: -0.01em;
+}
+.markdown h2 {
+  margin-top: 2.4rem;
+}
+.markdown > p,
+.markdown li {
+  max-width: 72ch;
+}
+
+code {
+  border: 1px solid var(--bv-outline);
+  color: #e6edf5;
+}
+a code {
+  color: inherit;
+}
+.theme-code-block {
+  border: 1px solid var(--bv-outline);
+  box-shadow: none !important;
+}
+.theme-code-block code {
+  border: 0;
+}
+.prism-code {
+  font-size: 0.86rem;
+}
+
+/* Code language tabs sit on the block like a lid. */
+.tabs-container > .tabs {
+  border-bottom: 1px solid var(--bv-outline);
+  margin-bottom: 0;
+}
+.tabs-container > .tabs + .margin-top--md {
+  margin-top: 0 !important;
+}
+.tabs__item {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px 8px 0 0;
+  font-weight: 500;
+  color: var(--bv-muted);
+}
+.tabs__item--active {
+  color: var(--bv-action);
+}
+.tabs-container .theme-code-block {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: 0;
+}
+
+/* Tables: endpoint fields, error codes */
+.markdown table {
+  display: table;
+  width: 100%;
+  font-size: 0.95rem;
+}
+/* On narrow screens a wide table scrolls inside itself, not the page. */
+@media (max-width: 996px) {
+  .markdown table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+.markdown table th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--bv-muted);
+}
+.markdown table td,
+.markdown table th {
+  border-color: var(--bv-outline);
+}
+
+/* Admonitions: flat panels with a coloured edge. */
+.theme-admonition {
+  border: 1px solid var(--bv-outline);
+  border-left-width: 4px;
+  box-shadow: none;
+}
+
+.menu__link {
+  border-radius: 8px;
+}
+.menu__list-item-collapsible:hover {
+  background: none;
+}
+.table-of-contents__link--active {
+  color: var(--bv-action);
+}
+
+/* Method badges in endpoint headings: <span class="method get">GET</span> */
+.method {
+  display: inline-block;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.12rem 0.5rem;
+  border-radius: 6px;
+  vertical-align: 0.2em;
+  margin-right: 0.5rem;
+  color: var(--bv-action-ink);
+}
+.method.get {
+  background: var(--bv-action);
+}
+.method.post {
+  background: var(--bv-link);
+}
+
+.endpoint {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 1rem;
+  background: var(--bv-inset);
+  border: 1px solid var(--bv-outline);
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 1.4rem;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.footer {
+  border-top: 1px solid var(--bv-outline);
+}
+.footer__copyright {
+  color: var(--bv-muted);
+  font-size: 0.9rem;
+}
+
+:focus-visible {
+  outline: 2px solid var(--bv-action);
+  outline-offset: 2px;
+}

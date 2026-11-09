@@ -1,0 +1,61 @@
+---
+title: Authentication
+description: API keys, how to send them, and how to keep them safe.
+---
+
+Every request needs an API key, sent as a bearer token:
+
+```http
+Authorization: Bearer <your API key>
+```
+
+Signing in to bonkverse.io doesn't count: requests without a key get
+`401`, even from a logged-in browser.
+
+## Get a key
+
+Keys are given out by hand while the API is new. Message **the_saucy_tulip** on
+the [Bonkverse Discord](https://discord.gg/2Zx7Cwhr4Z) with:
+
+- what you're building and a link to it,
+- roughly how many players you'll look up, and how often,
+- how to reach you if something breaks.
+
+You'll get the key once, in a private message. Bonkverse only stores a hash
+of it, so a lost key can't be shown again; it gets revoked and replaced.
+
+## What a key looks like
+
+```text
+bvk_ab12cd34_Xq3...43 characters...
+    └──┬───┘ └──────┬──────┘
+    prefix       secret
+```
+
+The **prefix** (`bvk_ab12cd34`) is safe to share: use it when you ask for
+help. The **secret** is the password. Never post the whole key.
+
+## Keep it secret
+
+- Call the API from your server or bot, not from browser JavaScript. Anything
+  in a web page can be read by anyone who opens it.
+- Keep it in an environment variable or your host's secrets settings, not in git.
+- If a key leaks, tell us and we'll revoke it straight away. Revoked keys
+  stop working immediately.
+
+## Key tiers
+
+| Tier | For | Limits |
+|---|---|---|
+| `standard` | Most sites and bots | [60 reads/min, 10 bulk lookups/min](rate-limits.md) |
+| `partner` | Sites we work with directly | [300 reads/min, 30 bulk lookups/min](rate-limits.md) |
+
+## Errors
+
+| Status | `error` | Meaning |
+|---|---|---|
+| 401 | `missing_api_key` | No `Authorization: Bearer …` header |
+| 401 | `invalid_api_key` | The key is wrong, malformed or revoked |
+| 429 | `rate_limited` | Too many failed key checks from your IP; wait `retry_after` seconds |
+
+Both 401s include `"auth": "api_key"`.
