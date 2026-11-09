@@ -1,0 +1,45 @@
+---
+slug: /api
+sidebar_label: Introduction
+title: The Bonkverse API
+description: Read bonk.io player levels and level history from Bonkverse's replay archive.
+---
+
+import LookupPreview from '@site/src/components/LookupPreview';
+
+The Bonkverse API lets your site or Discord bot read bonk.io player data that
+Bonkverse collects from public replays: each player's level, when that level
+was last seen, and how their level has grown over time.
+
+It's a small, read-only JSON API. Every request needs an API key.
+
+<LookupPreview />
+
+```text
+https://bonkverse.io/api/v1/
+```
+
+## What you can get
+
+| You want | Use |
+|---|---|
+| One player's current level and when it was seen | [`GET /players/{username}/`](endpoints/player.mdx) |
+| Up to 250 players at once, for a leaderboard | [`POST /lookup/players/`](endpoints/bulk-lookup.mdx) |
+| Every level-up a player has had | [`GET /players/{username}/level-history/`](endpoints/level-history.mdx) |
+| To check your key works | [`GET /me/`](endpoints/me.mdx) |
+
+Skins aren't in the API yet. They're next: see the [changelog](changelog.md).
+
+## Where the data comes from
+
+bonk.io doesn't publish player stats. Bonkverse archives public replays, and
+each replay records every registered player's level at the end of that
+round. The API reports what those replays showed, and when. Read
+[data and privacy](data-and-privacy.md) before you show the numbers to anyone,
+especially the part about what "last seen" means.
+
+## Get started
+
+1. [Ask for a key](authentication.mdx#get-a-key).
+2. Make your [first request](quickstart.mdx).
+3. If you're building a leaderboard, follow [sync a leaderboard](guides/sync-a-leaderboard.mdx).

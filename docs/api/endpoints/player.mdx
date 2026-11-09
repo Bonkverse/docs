@@ -1,0 +1,150 @@
+---
+title: Get a player
+sidebar_label: GET /players/{username}/
+description: One player's level, when it was last seen, and replay totals.
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<div className="endpoint"><span className="method get">GET</span>/api/v1/players/<em>{'{username}'}</em>/</div>
+
+One registered bonk.io player: their level in their latest archived replay,
+their peak level, when they were last seen, and how many replays they're in.
+
+## Path
+
+| Parameter | |
+|---|---|
+| `username` | Their bonk.io username, URL-encoded. Case doesn't matter. Spaces are real: `" comet"` and `"comet"` are different players. |
+
+:::note[Usernames "." and ".."]
+bonk.io allows the names `.` and `..`, which can't sit in a URL path. Write
+them as `~.` and `~..`: `/api/v1/players/~../`. A name that is only tildes and
+then one or two dots gets one more `~` in front (`~..` → `~~..`). Or use
+[bulk lookup](bulk-lookup.mdx), which takes names in a JSON body and has no such rule.
+:::
+
+## Request
+
+<Tabs groupId="lang" queryString>
+<TabItem value="curl" label="curl">
+
+```bash
+curl "https://bonkverse.io/api/v1/players/Saucy%20Tulip/" \
+  -H "Authorization: Bearer $BONKVERSE_API_KEY"
+```
+
+</TabItem>
+<TabItem value="js" label="JavaScript">
+
+```js
+async function getPlayer(username) {
+  const res = await fetch(
+    `https://bonkverse.io/api/v1/players/${encodeURIComponent(username)}/`,
+    { headers: { Authorization: `Bearer ${process.env.BONKVERSE_API_KEY}` } },
+  );
+  const body = await res.json();
+  if (!body.ok) throw new Error(body.error); // e.g. "player_not_found"
+  return body.data;
+}
+
+const player = await getPlayer("Saucy Tulip");
+console.log(`${player.username}: level ${player.level?.value ?? "hidden"}`);
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+import os
+from urllib.parse import quote
+
+import requests
+
+def get_player(username):
+    res = requests.get(
+        f"https://bonkverse.io/api/v1/players/{quote(username, safe='')}/",
+        headers={"Authorization": f"Bearer {os.environ['BONKVERSE_API_KEY']}"},
+        timeout=10,
+    )
+    body = res.json()
+    if not body["ok"]:
+        raise RuntimeError(body["error"])  # e.g. "player_not_found"
+    return body["data"]
+
+player = get_player("Saucy Tulip")
+level = (player["level"] or {}).get("value", "hidden")
+print(f"{player['username']}: level {level}")
+```
+
+</TabItem>
+</Tabs>
+
+## Response
+
+```json
+{
+  "ok": true,
+  "data": {
+    "requested": "saucy tulip",
+    "username": "Saucy Tulip",
+    "status": "found",
+    "level": {
+      "value": 54,
+      "peak": 54,
+      "seen_at": "2026-11-07T03:10:00.000Z",
+      "seen_day": "2026-11-07",
+      "estimated": false,
+      "source": "replays",
+      "replay": { "cycle": 6, "id": "344000" }
+    },
+    "games": 120,
+    "account": { "dbid": 4513377, "joined": "2017-08-21", "joined_estimated": true },
+    "bonkverse_account": true,
+    "profile_url": "https://bonkverse.io/player/Saucy%20Tulip/"
+  }
+}
+```
+
+### The player object
+
+The same object appears in [bulk lookup](bulk-lookup.mdx) results.
+
+| Field | Type | |
+|---|---|---|
+| `requested` | string | The name exactly as you sent it |
+| `username` | string | How the player spells it |
+| `status` | string | `found`, `private`, `not_found` or `unavailable` (the last two only appear in bulk lookup; here they're errors) |
+| `level` | object or `null` | `null` when `status` isn't `found` |
+| `level.value` | integer | Level in their latest archived replay |
+| `level.peak` | integer | Highest level seen in any replay |
+| `level.seen_at` | ISO 8601 time or `null` | When that replay was collected. [What this means](../data-and-privacy.md#what-seen-at-means) |
+| `level.seen_day` | `YYYY-MM-DD` | Day of that replay. Always set when `level` is |
+| `level.estimated` | boolean | `seen_day` is an estimate (older cycles) |
+| `level.source` | `"replays"` | Where the level came from. More sources may be added |
+| `level.replay` | `{cycle, id}` | The replay the level came from |
+| `games` | integer or `null` | How many archived replays they're in |
+| `account` | object or `null` | Their bonk.io account, when Bonkverse knows it (from friend lists and logins). Can be set even when `status` is `not_found` |
+| `account.dbid` | integer | bonk.io account ID (DBID). Never changes, even if they rename, so it's the best key for linking accounts |
+| `account.joined` | `YYYY-MM-DD` or `null` | Day the account was made, estimated from the DBID |
+| `account.joined_estimated` | boolean | Always `true` for now: bonk.io doesn't publish join dates |
+| `bonkverse_account` | boolean | They have a Bonkverse account |
+| `profile_url` | URL or `null` | Their Bonkverse profile. Link to it when you show their data |
+
+### Private players
+
+A player who hid their Level section on Bonkverse comes back with
+`"status": "private"` and `"level": null`. Show them without a level.
+
+## Errors
+
+| Status | `error` | |
+|---|---|---|
+| 404 | `player_not_found` | No replays for that registered name |
+| 503 | `upstream_unavailable` | The replay archive didn't answer; try later |
+| 400 | `invalid_username` | Empty or over 100 characters |
+
+Plus the [errors every endpoint can return](../errors.md).
+
+Answers are cached for about 5 minutes (`Cache-Control: private, max-age=300`).

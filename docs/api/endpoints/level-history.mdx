@@ -1,0 +1,128 @@
+---
+title: Level history
+sidebar_label: GET /players/{username}/level-history/
+description: Every level-up seen in a player's replays, and their level on each day they played.
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<div className="endpoint"><span className="method get">GET</span>/api/v1/players/<em>{'{username}'}</em>/level-history/</div>
+
+How a player's level grew: each time a new highest level showed up in their
+replays, and the highest level on every day they were in one. Good for
+charts and "levelled up this month" badges.
+
+The `username` rules are the same as [get a player](player.mdx#path).
+
+## Request
+
+<Tabs groupId="lang" queryString>
+<TabItem value="curl" label="curl">
+
+```bash
+curl https://bonkverse.io/api/v1/players/comet/level-history/ \
+  -H "Authorization: Bearer $BONKVERSE_API_KEY"
+```
+
+</TabItem>
+<TabItem value="js" label="JavaScript">
+
+```js
+const res = await fetch(
+  `https://bonkverse.io/api/v1/players/${encodeURIComponent("comet")}/level-history/`,
+  { headers: { Authorization: `Bearer ${process.env.BONKVERSE_API_KEY}` } },
+);
+const { ok, data, error } = await res.json();
+if (!ok) throw new Error(error);
+
+// Levels gained in the last 30 days
+const since = new Date(Date.now() - 30 * 864e5).toISOString().slice(0, 10);
+const gained = data.level_ups.filter((up) => up.day >= since).length;
+console.log(`${data.username} gained ${gained} levels in 30 days`);
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+import os
+from datetime import date, timedelta
+from urllib.parse import quote
+
+import requests
+
+res = requests.get(
+    f"https://bonkverse.io/api/v1/players/{quote('comet', safe='')}/level-history/",
+    headers={"Authorization": f"Bearer {os.environ['BONKVERSE_API_KEY']}"},
+    timeout=15,
+)
+body = res.json()
+if not body["ok"]:
+    raise RuntimeError(body["error"])
+data = body["data"]
+
+since = (date.today() - timedelta(days=30)).isoformat()
+gained = sum(1 for up in data["level_ups"] if up["day"] >= since)
+print(f"{data['username']} gained {gained} levels in 30 days")
+```
+
+</TabItem>
+</Tabs>
+
+## Response
+
+```json
+{
+  "ok": true,
+  "data": {
+    "username": "Comet",
+    "current_level": 87,
+    "peak_level": 87,
+    "level_ups": [
+      {
+        "level": 86,
+        "day": "2026-10-30",
+        "at": null,
+        "replay": { "cycle": 6, "id": "301877" }
+      },
+      {
+        "level": 87,
+        "day": "2026-11-08",
+        "at": "2026-11-08T03:00:00Z",
+        "replay": { "cycle": 6, "id": "344124" }
+      }
+    ],
+    "days": [
+      { "day": "2026-10-30", "level": 86 },
+      { "day": "2026-11-08", "level": 87 }
+    ]
+  }
+}
+```
+
+| Field | Type | |
+|---|---|---|
+| `current_level` | integer | Level in their latest replay |
+| `peak_level` | integer | Highest level seen |
+| `level_ups[]` | array, oldest first | Each new highest level |
+| `level_ups[].level` | integer | The new level |
+| `level_ups[].day` | `YYYY-MM-DD` | Day of the first replay showing it |
+| `level_ups[].at` | ISO 8601 time or `null` | Exact time, for replays collected live |
+| `level_ups[].replay` | `{cycle, id}` | That replay |
+| `days[]` | array, oldest first | Highest level on each day they were in a replay |
+
+A level-up is when a level was **first seen**, not the moment it happened:
+if someone plays in rooms Bonkverse doesn't archive, it shows up the next
+time they're in one. The first replay ever is never a level-up.
+
+## Errors
+
+| Status | `error` | |
+|---|---|---|
+| 403 | `player_private` | They hid their Level section on Bonkverse |
+| 404 | `player_not_found` | No replays for that registered name |
+| 503 | `upstream_unavailable` | The replay archive didn't answer |
+
+Players with tens of thousands of replays can take a few seconds the first
+time; use a timeout of 15 seconds or more.

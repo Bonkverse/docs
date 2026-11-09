@@ -1,0 +1,148 @@
+---
+title: Quickstart
+description: Make your first Bonkverse API request.
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+You need an API key. If you don't have one yet, [ask for one](authentication.mdx#get-a-key).
+
+## 1. Keep your key out of your code
+
+Put the key in an environment variable, not in a file you commit and never
+in code that runs in someone's browser.
+
+```bash
+export BONKVERSE_API_KEY="paste your key here"
+```
+
+## 2. Check the key works
+
+<Tabs groupId="lang" queryString>
+<TabItem value="curl" label="curl">
+
+```bash
+curl https://bonkverse.io/api/v1/me/ \
+  -H "Authorization: Bearer $BONKVERSE_API_KEY"
+```
+
+</TabItem>
+<TabItem value="js" label="JavaScript">
+
+```js
+// Node 18+ (fetch is built in)
+const res = await fetch("https://bonkverse.io/api/v1/me/", {
+  headers: { Authorization: `Bearer ${process.env.BONKVERSE_API_KEY}` },
+});
+console.log(await res.json());
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+import os
+import requests
+
+res = requests.get(
+    "https://bonkverse.io/api/v1/me/",
+    headers={"Authorization": f"Bearer {os.environ['BONKVERSE_API_KEY']}"},
+    timeout=10,
+)
+print(res.json())
+```
+
+</TabItem>
+</Tabs>
+
+You should get your key's name back:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "name": "Your site",
+    "prefix": "bvk_ab12cd34",
+    "tier": "standard",
+    "created_at": "2026-11-08T22:10:00+00:00"
+  }
+}
+```
+
+A `401` means the key is missing or wrong: see [authentication](authentication.mdx).
+
+## 3. Look up a player
+
+<Tabs groupId="lang" queryString>
+<TabItem value="curl" label="curl">
+
+```bash
+curl https://bonkverse.io/api/v1/players/comet/ \
+  -H "Authorization: Bearer $BONKVERSE_API_KEY"
+```
+
+</TabItem>
+<TabItem value="js" label="JavaScript">
+
+```js
+const name = "comet";
+const res = await fetch(
+  `https://bonkverse.io/api/v1/players/${encodeURIComponent(name)}/`,
+  { headers: { Authorization: `Bearer ${process.env.BONKVERSE_API_KEY}` } },
+);
+const body = await res.json();
+if (body.ok) console.log(body.data.username, body.data.level?.value);
+else console.log("error:", body.error);
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+from urllib.parse import quote
+
+name = "comet"
+res = requests.get(
+    f"https://bonkverse.io/api/v1/players/{quote(name, safe='')}/",
+    headers={"Authorization": f"Bearer {os.environ['BONKVERSE_API_KEY']}"},
+    timeout=10,
+)
+body = res.json()
+if body["ok"]:
+    print(body["data"]["username"], (body["data"]["level"] or {}).get("value"))
+else:
+    print("error:", body["error"])
+```
+
+</TabItem>
+</Tabs>
+
+```json
+{
+  "ok": true,
+  "data": {
+    "requested": "comet",
+    "username": "Comet",
+    "status": "found",
+    "level": {
+      "value": 87,
+      "peak": 87,
+      "seen_at": "2026-11-08T03:00:00.000Z",
+      "seen_day": "2026-11-08",
+      "estimated": false,
+      "source": "replays",
+      "replay": { "cycle": 6, "id": "344124" }
+    },
+    "games": 120,
+    "account": { "dbid": 9876543, "joined": "2019-06-02", "joined_estimated": true },
+    "bonkverse_account": true,
+    "profile_url": "https://bonkverse.io/player/Comet/"
+  }
+}
+```
+
+## Next
+
+- Looking up lots of players? Use [bulk lookup](endpoints/bulk-lookup.mdx): one request for up to 250.
+- Showing levels on your site? Read [what "last seen" means](data-and-privacy.md#what-seen-at-means).

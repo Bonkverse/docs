@@ -1,0 +1,175 @@
+---
+title: Sync a leaderboard
+description: Keep levels for a list of players up to date in your own database.
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+You have a list of players (your ranked ladder, a clan, a tier list) and
+want each one's bonk.io level on your site, with when it was last seen.
+
+The pattern:
+
+1. Once a day (or whenever you like), send your whole list to
+   [bulk lookup](../endpoints/bulk-lookup.mdx). Up to 250 names is one request.
+2. Save the results in your own database.
+3. Your website reads from your database, never from Bonkverse directly.
+
+Your site stays fast and keeps working if Bonkverse is briefly down.
+
+## The sync script
+
+This script reads player names, looks them up, and writes what it learned to
+`levels.json`. Swap the file for your database. It keeps the last known
+level when Bonkverse can't answer, and removes it when a player goes private.
+
+<Tabs groupId="lang" queryString>
+<TabItem value="js" label="JavaScript">
+
+```js title="sync-levels.mjs"
+// Node 18+. Run: BONKVERSE_API_KEY=bvk_... node sync-levels.mjs
+import { readFile, writeFile } from "node:fs/promises";
+
+const API = "https://bonkverse.io/api/v1";
+const KEY = process.env.BONKVERSE_API_KEY;
+const MAX_PER_REQUEST = 250;
+
+async function lookup(usernames) {
+  const res = await fetch(`${API}/lookup/players/`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ usernames }),
+  });
+  if (res.status === 429) {
+    const wait = Number(res.headers.get("Retry-After") ?? 60);
+    await new Promise((r) => setTimeout(r, wait * 1000));
+    return lookup(usernames);
+  }
+  const body = await res.json();
+  if (!body.ok) throw new Error(`Bonkverse API: ${body.error}`);
+  return body.data.players;
+}
+
+// Your roster. Use the exact bonk.io usernames you've linked.
+const roster = JSON.parse(await readFile("roster.json", "utf8")); // ["comet", "pebble", ...]
+const saved = JSON.parse(await readFile("levels.json", "utf8").catch(() => "{}"));
+
+for (let i = 0; i < roster.length; i += MAX_PER_REQUEST) {
+  const players = await lookup(roster.slice(i, i + MAX_PER_REQUEST));
+  for (const p of players) {
+    const key = p.requested.toLowerCase();
+    // The DBID never changes, even if they rename: keep it once you have it.
+    const dbid = p.account?.dbid ?? saved[key]?.dbid ?? null;
+    if (p.status === "found") {
+      saved[key] = {
+        username: p.username,
+        dbid,
+        level: p.level.value,
+        lastSeen: p.level.seen_day, // show as "last seen", not "updated"
+        profileUrl: p.profile_url,
+        checkedAt: new Date().toISOString(),
+      };
+    } else if (p.status === "private" || p.status === "not_found") {
+      saved[key] = { username: p.username, dbid, level: null, profileUrl: p.profile_url };
+    }
+    // "unavailable" or anything new: keep what we had.
+  }
+}
+
+await writeFile("levels.json", JSON.stringify(saved, null, 2));
+console.log(`Synced ${roster.length} players`);
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python title="sync_levels.py"
+# Run: BONKVERSE_API_KEY=bvk_... python sync_levels.py
+import json
+import os
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+import requests
+
+API = "https://bonkverse.io/api/v1"
+KEY = os.environ["BONKVERSE_API_KEY"]
+MAX_PER_REQUEST = 250
+
+
+def lookup(usernames):
+    while True:
+        res = requests.post(
+            f"{API}/lookup/players/",
+            headers={"Authorization": f"Bearer {KEY}"},
+            json={"usernames": usernames},
+            timeout=30,
+        )
+        if res.status_code == 429:
+            time.sleep(int(res.headers.get("Retry-After", 60)))
+            continue
+        body = res.json()
+        if not body["ok"]:
+            raise RuntimeError(f"Bonkverse API: {body['error']}")
+        return body["data"]["players"]
+
+
+# Your roster. Use the exact bonk.io usernames you've linked.
+roster = json.loads(Path("roster.json").read_text())  # ["comet", "pebble", ...]
+levels_file = Path("levels.json")
+saved = json.loads(levels_file.read_text()) if levels_file.exists() else {}
+
+for start in range(0, len(roster), MAX_PER_REQUEST):
+    for p in lookup(roster[start : start + MAX_PER_REQUEST]):
+        key = p["requested"].lower()
+        # The DBID never changes, even if they rename: keep it once you have it.
+        dbid = (p["account"] or {}).get("dbid") or saved.get(key, {}).get("dbid")
+        if p["status"] == "found":
+            saved[key] = {
+                "username": p["username"],
+                "dbid": dbid,
+                "level": p["level"]["value"],
+                "last_seen": p["level"]["seen_day"],  # show as "last seen", not "updated"
+                "profile_url": p["profile_url"],
+                "checked_at": datetime.now(timezone.utc).isoformat(),
+            }
+        elif p["status"] in ("private", "not_found"):
+            saved[key] = {
+                "username": p["username"],
+                "dbid": dbid,
+                "level": None,
+                "profile_url": p["profile_url"],
+            }
+        # "unavailable" or anything new: keep what we had.
+
+levels_file.write_text(json.dumps(saved, indent=2))
+print(f"Synced {len(roster)} players")
+```
+
+</TabItem>
+</Tabs>
+
+## Run it on a schedule
+
+Data changes a few times a day at most, so **once a day** is plenty for a
+leaderboard. Some ways to schedule it:
+
+- **Your Discord bot:** run the sync on a timer inside the bot (for example
+  with `setInterval` once every 24 hours, or `discord.ext.tasks.loop(hours=24)`
+  in discord.py).
+- **A server you control:** a cron line like `17 6 * * *` (06:17 every day;
+  an odd minute keeps you off the busy top of the hour).
+- **GitHub Actions:** a workflow with `on: schedule`, storing
+  `BONKVERSE_API_KEY` as a repository secret.
+
+## Show it well
+
+- Label the date "Last seen" and link each name to its `profile_url`. A
+  credit line like "Levels from [Bonkverse](https://bonkverse.io)" under the
+  table is appreciated.
+- A level that's months old is still correct; it means the player hasn't
+  been in an archived room since. Show the date and let people judge.
+- Players marked `private` asked not to have their level shown. Leave the
+  level blank.
