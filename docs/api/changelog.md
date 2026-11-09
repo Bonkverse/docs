@@ -3,6 +3,13 @@ title: Changelog
 description: Changes to the Bonkverse API.
 ---
 
+## Developer portal (November 2026)
+
+- Make, copy and revoke your own keys at
+  [bonkverse.io/developers/keys](https://bonkverse.io/developers/keys/), after
+  agreeing to the [API terms](https://bonkverse.io/developers/terms/). Up to
+  3 active keys per account. No API changes.
+
 ## v1 (November 2026)
 
 First release.

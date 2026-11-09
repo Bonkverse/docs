@@ -14,15 +14,20 @@ Signing in to bonkverse.io doesn't count: requests without a key get
 
 ## Get a key
 
-Keys are given out by hand while the API is new. Message **the_saucy_tulip** on
-the [Bonkverse Discord](https://discord.gg/2Zx7Cwhr4Z) with:
+Make your own in the developer portal:
 
-- what you're building and a link to it,
-- roughly how many players you'll look up, and how often,
-- how to reach you if something breaks.
+1. Sign in to [bonkverse.io](https://bonkverse.io) (with your bonk.io account).
+2. Go to **[bonkverse.io/developers/keys](https://bonkverse.io/developers/keys/)**
+   (also in the menu: Tools → Developer API).
+3. Name the key after what it's for, agree to the
+   [API terms](https://bonkverse.io/developers/terms/) the first time, and
+   press **Create key**.
+4. Copy it straight away. **It's shown once.** Bonkverse only stores a
+   fingerprint of it, so a lost key can't be shown again: revoke it on the
+   same page and make another.
 
-You'll get the key once, in a private message. Bonkverse only stores a hash
-of it, so a lost key can't be shown again; it gets revoked and replaced.
+You can have up to 3 active keys, one per site or bot. Keys made in the
+portal are standard keys; for higher limits, see [key tiers](#key-tiers).
 
 ## What a key looks like
 
@@ -40,8 +45,8 @@ help. The **secret** is the password. Never post the whole key.
 - Call the API from your server or bot, not from browser JavaScript. Anything
   in a web page can be read by anyone who opens it.
 - Keep it in an environment variable or your host's secrets settings, not in git.
-- If a key leaks, tell us and we'll revoke it straight away. Revoked keys
-  stop working immediately.
+- If a key leaks, revoke it in the [portal](https://bonkverse.io/developers/keys/)
+  and make a new one. Revoked keys stop working immediately.
 
 ## Key tiers
 
@@ -49,6 +54,10 @@ help. The **secret** is the password. Never post the whole key.
 |---|---|---|
 | `standard` | Most sites and bots | [60 reads/min, 10 bulk lookups/min](rate-limits.md) |
 | `partner` | Sites we work with directly | [300 reads/min, 30 bulk lookups/min](rate-limits.md) |
+
+For a partner key, ask on the [Bonkverse Discord](https://discord.gg/2Zx7Cwhr4Z)
+with what you're building (and a link), roughly how many players you look up
+and how often, and your key's prefix. Partner keys are set up by hand.
 
 ## Errors
 

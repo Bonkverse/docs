@@ -26,7 +26,7 @@ codes don't change within v1. Some errors carry extra fields (like
 | 400 | `too_many_usernames` | More than 250 names; `max` says the limit | Split into several requests |
 | 400 | `invalid_username` | A name is empty, not a string, or over 100 characters | Check your list |
 | 401 | `missing_api_key` | No key sent | Add `Authorization: Bearer <key>` |
-| 401 | `invalid_api_key` | Key wrong, malformed or revoked | Check the key; ask for a new one if it was revoked |
+| 401 | `invalid_api_key` | Key wrong, malformed or revoked | Check the key; make a new one in the developer portal if it was revoked |
 | 403 | `player_private` | The player hid their level on Bonkverse (level history only) | Show nothing for them |
 | 404 | `player_not_found` | No replays for that registered name | Check spelling; they may not have played in an archived room |
 | 405 | `method_not_allowed` | Wrong HTTP method; `Allow` says which | Use the method in the docs |
