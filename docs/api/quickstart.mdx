@@ -78,7 +78,7 @@ A `401` means the key is missing or wrong: see [authentication](authentication.m
 <TabItem value="curl" label="curl">
 
 ```bash
-curl https://bonkverse.io/api/v1/players/comet/ \
+curl https://bonkverse.io/api/v1/players/The%20Saucy%20Tulip/ \
   -H "Authorization: Bearer $BONKVERSE_API_KEY"
 ```
 
@@ -86,7 +86,7 @@ curl https://bonkverse.io/api/v1/players/comet/ \
 <TabItem value="js" label="JavaScript">
 
 ```js
-const name = "comet";
+const name = "The Saucy Tulip";
 const res = await fetch(
   `https://bonkverse.io/api/v1/players/${encodeURIComponent(name)}/`,
   { headers: { Authorization: `Bearer ${process.env.BONKVERSE_API_KEY}` } },
@@ -102,7 +102,7 @@ else console.log("error:", body.error);
 ```python
 from urllib.parse import quote
 
-name = "comet"
+name = "The Saucy Tulip"
 res = requests.get(
     f"https://bonkverse.io/api/v1/players/{quote(name, safe='')}/",
     headers={"Authorization": f"Bearer {os.environ['BONKVERSE_API_KEY']}"},
@@ -122,22 +122,22 @@ else:
 {
   "ok": true,
   "data": {
-    "requested": "comet",
-    "username": "Comet",
+    "requested": "The Saucy Tulip",
+    "username": "The Saucy Tulip",
     "status": "found",
     "level": {
-      "value": 87,
-      "peak": 87,
-      "seen_at": "2026-11-08T03:00:00.000Z",
-      "seen_day": "2026-11-08",
+      "value": 206,
+      "peak": 206,
+      "seen_at": "2026-11-12T15:24:37.214Z",
+      "seen_day": "2026-11-12",
       "estimated": false,
       "source": "replays",
-      "replay": { "cycle": 6, "id": "344124" }
+      "replay": { "cycle": 6, "id": "355551" }
     },
-    "games": 120,
-    "account": { "dbid": 9876543, "joined": "2019-06-02", "joined_estimated": true },
+    "games": 1869,
+    "account": { "dbid": 13159907, "joined": "2023-04-28", "joined_estimated": true },
     "bonkverse_account": true,
-    "profile_url": "https://bonkverse.io/player/Comet/"
+    "profile_url": "https://bonkverse.io/player/The%20Saucy%20Tulip/"
   }
 }
 ```

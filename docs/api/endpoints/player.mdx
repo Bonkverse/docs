@@ -31,7 +31,7 @@ then one or two dots gets one more `~` in front (`~..` → `~~..`). Or use
 <TabItem value="curl" label="curl">
 
 ```bash
-curl "https://bonkverse.io/api/v1/players/Saucy%20Tulip/" \
+curl "https://bonkverse.io/api/v1/players/The%20Saucy%20Tulip/" \
   -H "Authorization: Bearer $BONKVERSE_API_KEY"
 ```
 
@@ -49,7 +49,7 @@ async function getPlayer(username) {
   return body.data;
 }
 
-const player = await getPlayer("Saucy Tulip");
+const player = await getPlayer("The Saucy Tulip");
 console.log(`${player.username}: level ${player.level?.value ?? "hidden"}`);
 ```
 
@@ -73,7 +73,7 @@ def get_player(username):
         raise RuntimeError(body["error"])  # e.g. "player_not_found"
     return body["data"]
 
-player = get_player("Saucy Tulip")
+player = get_player("The Saucy Tulip")
 level = (player["level"] or {}).get("value", "hidden")
 print(f"{player['username']}: level {level}")
 ```
@@ -87,22 +87,22 @@ print(f"{player['username']}: level {level}")
 {
   "ok": true,
   "data": {
-    "requested": "saucy tulip",
-    "username": "Saucy Tulip",
+    "requested": "The Saucy Tulip",
+    "username": "The Saucy Tulip",
     "status": "found",
     "level": {
-      "value": 54,
-      "peak": 54,
-      "seen_at": "2026-11-07T03:10:00.000Z",
-      "seen_day": "2026-11-07",
+      "value": 206,
+      "peak": 206,
+      "seen_at": "2026-11-12T15:24:37.214Z",
+      "seen_day": "2026-11-12",
       "estimated": false,
       "source": "replays",
-      "replay": { "cycle": 6, "id": "344000" }
+      "replay": { "cycle": 6, "id": "355551" }
     },
-    "games": 120,
-    "account": { "dbid": 4513377, "joined": "2017-08-21", "joined_estimated": true },
+    "games": 1869,
+    "account": { "dbid": 13159907, "joined": "2023-04-28", "joined_estimated": true },
     "bonkverse_account": true,
-    "profile_url": "https://bonkverse.io/player/Saucy%20Tulip/"
+    "profile_url": "https://bonkverse.io/player/The%20Saucy%20Tulip/"
   }
 }
 ```

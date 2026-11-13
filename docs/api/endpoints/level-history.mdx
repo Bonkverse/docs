@@ -21,7 +21,7 @@ The `username` rules are the same as [get a player](player.mdx#path).
 <TabItem value="curl" label="curl">
 
 ```bash
-curl https://bonkverse.io/api/v1/players/comet/level-history/ \
+curl https://bonkverse.io/api/v1/players/The%20Saucy%20Tulip/level-history/ \
   -H "Authorization: Bearer $BONKVERSE_API_KEY"
 ```
 
@@ -30,7 +30,7 @@ curl https://bonkverse.io/api/v1/players/comet/level-history/ \
 
 ```js
 const res = await fetch(
-  `https://bonkverse.io/api/v1/players/${encodeURIComponent("comet")}/level-history/`,
+  `https://bonkverse.io/api/v1/players/${encodeURIComponent("The Saucy Tulip")}/level-history/`,
   { headers: { Authorization: `Bearer ${process.env.BONKVERSE_API_KEY}` } },
 );
 const { ok, data, error } = await res.json();
@@ -53,7 +53,7 @@ from urllib.parse import quote
 import requests
 
 res = requests.get(
-    f"https://bonkverse.io/api/v1/players/{quote('comet', safe='')}/level-history/",
+    f"https://bonkverse.io/api/v1/players/{quote('The Saucy Tulip', safe='')}/level-history/",
     headers={"Authorization": f"Bearer {os.environ['BONKVERSE_API_KEY']}"},
     timeout=15,
 )
@@ -70,32 +70,46 @@ print(f"{data['username']} gained {gained} levels in 30 days")
 </TabItem>
 </Tabs>
 
-## Response
+## Example response
+
+The arrays below show only the last two entries from a live response.
 
 ```json
 {
   "ok": true,
   "data": {
-    "username": "Comet",
-    "current_level": 87,
-    "peak_level": 87,
+    "username": "The Saucy Tulip",
+    "current_level": 206,
+    "peak_level": 206,
     "level_ups": [
       {
-        "level": 86,
-        "day": "2026-10-30",
-        "at": null,
-        "replay": { "cycle": 6, "id": "301877" }
+        "level": 205,
+        "day": "2026-10-06",
+        "at": "2026-10-06T02:25:47.108161+00:00",
+        "replay": {
+          "cycle": 6,
+          "id": "274255"
+        }
       },
       {
-        "level": 87,
-        "day": "2026-11-08",
-        "at": "2026-11-08T03:00:00Z",
-        "replay": { "cycle": 6, "id": "344124" }
+        "level": 206,
+        "day": "2026-10-31",
+        "at": "2026-10-31T19:56:36.214096+00:00",
+        "replay": {
+          "cycle": 6,
+          "id": "329624"
+        }
       }
     ],
     "days": [
-      { "day": "2026-10-30", "level": 86 },
-      { "day": "2026-11-08", "level": 87 }
+      {
+        "day": "2026-11-08",
+        "level": 206
+      },
+      {
+        "day": "2026-11-12",
+        "level": 206
+      }
     ]
   }
 }

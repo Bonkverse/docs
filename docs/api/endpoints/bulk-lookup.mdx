@@ -17,7 +17,7 @@ fails the request. It counts as one request against your
 ## Body
 
 ```json
-{ "usernames": ["comet", "pebble", "marmot", "Tidepool", "ghostie"] }
+{ "usernames": ["The Saucy Tulip", "pebble", "marmot", "Tidepool", "ghostie"] }
 ```
 
 | Field | Type | |
@@ -35,7 +35,7 @@ Send `Content-Type: application/json`.
 curl https://bonkverse.io/api/v1/lookup/players/ \
   -H "Authorization: Bearer $BONKVERSE_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"usernames": ["comet", "pebble", "marmot", "Tidepool", "ghostie"]}'
+  -d '{"usernames": ["The Saucy Tulip", "pebble", "marmot", "Tidepool", "ghostie"]}'
 ```
 
 </TabItem>
@@ -56,7 +56,7 @@ async function lookupPlayers(usernames) {
   return body.data.players;
 }
 
-const players = await lookupPlayers(["comet", "pebble", "marmot", "Tidepool", "ghostie"]);
+const players = await lookupPlayers(["The Saucy Tulip", "pebble", "marmot", "Tidepool", "ghostie"]);
 for (const p of players) {
   console.log(p.username, p.status, p.level?.value ?? "-");
 }
@@ -81,7 +81,7 @@ def lookup_players(usernames):
         raise RuntimeError(body["error"])
     return body["data"]["players"]
 
-for p in lookup_players(["comet", "pebble", "marmot", "Tidepool", "ghostie"]):
+for p in lookup_players(["The Saucy Tulip", "pebble", "marmot", "Tidepool", "ghostie"]):
     print(p["username"], p["status"], (p["level"] or {}).get("value", "-"))
 ```
 
@@ -96,22 +96,22 @@ for p in lookup_players(["comet", "pebble", "marmot", "Tidepool", "ghostie"]):
   "data": {
     "players": [
       {
-        "requested": "comet",
-        "username": "Comet",
+        "requested": "The Saucy Tulip",
+        "username": "The Saucy Tulip",
         "status": "found",
         "level": {
-          "value": 87,
-          "peak": 87,
-          "seen_at": "2026-11-08T03:00:00.000Z",
-          "seen_day": "2026-11-08",
+          "value": 206,
+          "peak": 206,
+          "seen_at": "2026-11-12T15:24:37.214Z",
+          "seen_day": "2026-11-12",
           "estimated": false,
           "source": "replays",
-          "replay": { "cycle": 6, "id": "344124" }
+          "replay": { "cycle": 6, "id": "355551" }
         },
-        "games": 4120,
-        "account": { "dbid": 9876543, "joined": "2019-06-02", "joined_estimated": true },
-        "bonkverse_account": false,
-        "profile_url": "https://bonkverse.io/player/Comet/"
+        "games": 1869,
+        "account": { "dbid": 13159907, "joined": "2023-04-28", "joined_estimated": true },
+        "bonkverse_account": true,
+        "profile_url": "https://bonkverse.io/player/The%20Saucy%20Tulip/"
       },
       {
         "requested": "pebble",
