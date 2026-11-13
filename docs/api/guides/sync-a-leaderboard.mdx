@@ -52,7 +52,7 @@ async function lookup(usernames) {
 }
 
 // Your roster. Use the exact bonk.io usernames you've linked.
-const roster = JSON.parse(await readFile("roster.json", "utf8")); // ["comet", "pebble", ...]
+const roster = JSON.parse(await readFile("roster.json", "utf8")); // ["The Saucy Tulip", "pebble", ...]
 const saved = JSON.parse(await readFile("levels.json", "utf8").catch(() => "{}"));
 
 for (let i = 0; i < roster.length; i += MAX_PER_REQUEST) {
@@ -117,7 +117,7 @@ def lookup(usernames):
 
 
 # Your roster. Use the exact bonk.io usernames you've linked.
-roster = json.loads(Path("roster.json").read_text())  # ["comet", "pebble", ...]
+roster = json.loads(Path("roster.json").read_text())  # ["The Saucy Tulip", "pebble", ...]
 levels_file = Path("levels.json")
 saved = json.loads(levels_file.read_text()) if levels_file.exists() else {}
 

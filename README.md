@@ -40,8 +40,8 @@ Node 20+.
   `groupId="lang"`, so a reader's language choice sticks across pages.
   Every example must run as pasted: real URLs, the key from
   `BONKVERSE_API_KEY`, nothing to fill in but the player name.
-- Use made-up player names in examples (comet, pebble, ghostie), never real
-  players.
+- Use `The Saucy Tulip` for runnable examples that demonstrate a successful
+  lookup. Use made-up names for illustrative results such as private or missing players.
 - Admonitions: `:::note[Title]` (the `:::note Title` form doesn't work with
   `future.v4`). Custom heading IDs: `## Heading \{#my-id\}`.
 - Wide tables scroll inside themselves on phones; check pages at 390 px wide.
