@@ -3,6 +3,13 @@ title: Changelog
 description: Changes to the Bonkverse API.
 ---
 
+## Skins (November 2026)
+
+- Each player object has a `skin`: the skin code they last wore, a 512 px
+  image, a 128 px thumbnail and when it was seen. `null` until Bonkverse
+  has seen the player wear one, which for now means they signed in to
+  Bonkverse. See [Skins](data-and-privacy.md#skins).
+
 ## Developer portal (November 2026)
 
 - Make, copy and revoke your own keys at
@@ -24,6 +31,6 @@ First release.
 
 ## Next
 
-- **Skins:** each player's most recently seen skin, with a rendered image
-  URL. The replay archive needs to record which skin was worn in each
-  replay first.
+- **Skins from replays:** fill in `skin` for players who have never signed
+  in to Bonkverse. The replay archive needs to record which skin was worn
+  in each replay first.
