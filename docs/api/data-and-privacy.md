@@ -32,15 +32,19 @@ sign in. It's `null` for players Bonkverse hasn't met that way yet.
 
 ## Skins \{#skins\}
 
-`skin` is the skin the player last wore in game. Like `account`, it comes
-from Bonkverse itself, not from replays: Bonkverse sees it when the player
-signs in to Bonkverse with their bonk.io account, or wears a skin from
-Bonkverse. It's `null` for players Bonkverse hasn't seen that way yet, so
-expect most players to have none for now. Replays will fill this in for
-everyone later.
+`skin` is the skin the player last wore in game, from the newest of:
 
-- `skin.seen_at` is when Bonkverse saw them wearing it. They may have
-  changed skin in game since.
+- their latest archived replay (every replay records each player's skin),
+- signing in to Bonkverse with their bonk.io account,
+- wearing a skin from Bonkverse.
+
+So any registered player with replays has one; it's `null` only for players
+Bonkverse has never seen in a replay or a sign-in.
+
+- `skin.seen_at` is when Bonkverse saw them wearing it: when that replay
+  was collected (for replays archived after the fact, the estimated day at
+  00:00 UTC), or when they signed in or wore it. They may have changed skin
+  in game since.
 - The image URLs change when their skin does (the `v` in the URL), so it's
   safe to cache an image by its URL. Fetch the player again to see whether
   their skin changed.

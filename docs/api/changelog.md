@@ -3,6 +3,12 @@ title: Changelog
 description: Changes to the Bonkverse API.
 ---
 
+## Skins from replays (November 2026)
+
+- `skin` now comes from replays too, so every registered player with
+  archived replays has one, not only players who signed in to Bonkverse.
+  Same field, no changes to its shape.
+
 ## Skins (November 2026)
 
 - Each player object has a `skin`: the skin code they last wore, a 512 px
@@ -28,9 +34,3 @@ First release.
 - Players who hide their level on Bonkverse are `private` here too.
 - Each player has an `account` with their bonk.io account ID (DBID) and
   an estimated join day, when Bonkverse knows them.
-
-## Next
-
-- **Skins from replays:** fill in `skin` for players who have never signed
-  in to Bonkverse. The replay archive needs to record which skin was worn
-  in each replay first.
