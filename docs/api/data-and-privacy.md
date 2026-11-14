@@ -32,7 +32,7 @@ sign in. It's `null` for players Bonkverse hasn't met that way yet.
 
 ## Skins \{#skins\}
 
-`skin` is the skin the player last wore in game, from the newest of:
+`skin` has images of the skin the player last wore in game, from the newest of:
 
 - their latest archived replay (every replay records each player's skin),
 - signing in to Bonkverse with their bonk.io account,
@@ -52,7 +52,11 @@ Bonkverse has never seen in a replay or a sign-in.
   can take a few seconds. It answers `404` if the skin can't be drawn; show
   a placeholder then.
 - Skins aren't private: anyone sees them in game and on the player's
-  Bonkverse profile.
+  Bonkverse profile. That's why the API shows them.
+- The API gives images, never the skin code. A code is the skin itself:
+  with it anyone can wear or edit an exact copy, and skin creators should
+  decide who copies their work. If your project needs a player's skin to
+  wear, ask the player.
 
 ## What `seen_at` means \{#what-seen-at-means\}
 
@@ -85,6 +89,7 @@ Players with a Bonkverse account can hide sections of their profile in
 
 ## What the API never returns
 
+- Skin codes (see [Skins](#skins)).
 - Account XP from a player's own bonk.io login. Bonkverse sees it when a
   player signs in, but they gave it to Bonkverse, not to other sites.
 - Friend lists, passwords, tokens or anything else from a bonk.io login.
