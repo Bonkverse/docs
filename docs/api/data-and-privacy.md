@@ -30,6 +30,26 @@ sign in. It's `null` for players Bonkverse hasn't met that way yet.
 - `joined` is estimated from the DBID (IDs were handed out in order), so it
   can be off by days or weeks. Say "joined around" rather than an exact date.
 
+## Skins \{#skins\}
+
+`skin` is the skin the player last wore in game. Like `account`, it comes
+from Bonkverse itself, not from replays: Bonkverse sees it when the player
+signs in to Bonkverse with their bonk.io account, or wears a skin from
+Bonkverse. It's `null` for players Bonkverse hasn't seen that way yet, so
+expect most players to have none for now. Replays will fill this in for
+everyone later.
+
+- `skin.seen_at` is when Bonkverse saw them wearing it. They may have
+  changed skin in game since.
+- The image URLs change when their skin does (the `v` in the URL), so it's
+  safe to cache an image by its URL. Fetch the player again to see whether
+  their skin changed.
+- An image is drawn the first time anyone asks for it, so the first request
+  can take a few seconds. It answers `404` if the skin can't be drawn; show
+  a placeholder then.
+- Skins aren't private: anyone sees them in game and on the player's
+  Bonkverse profile.
+
 ## What `seen_at` means \{#what-seen-at-means\}
 
 `seen_at` is when Bonkverse collected the replay that showed this level. It
