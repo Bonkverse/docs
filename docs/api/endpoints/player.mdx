@@ -105,7 +105,6 @@ print(f"{player['username']}: level {level}")
     "bonkverse_account": true,
     "profile_url": "https://bonkverse.io/player/The%20Saucy%20Tulip/",
     "skin": {
-      "skin_code": "CgcDYQACCQMBCgcFYWwAAQANPhmZmgAAAAAAAAAAAAAAAAAAAPr6+gAAAAA=",
       "image_url": "https://bonkverse.io/player/The%20Saucy%20Tulip/skin.png?v=7cd88ef5105c",
       "thumbnail_url": "https://bonkverse.io/player/The%20Saucy%20Tulip/skin-thumb.png?v=7cd88ef5105c",
       "seen_at": "2026-11-14T08:30:15.123Z"
@@ -138,8 +137,7 @@ The same object appears in [bulk lookup](bulk-lookup.mdx) results.
 | `account.joined_estimated` | boolean | Always `true` for now: bonk.io doesn't publish join dates |
 | `bonkverse_account` | boolean | They have a Bonkverse account |
 | `profile_url` | URL or `null` | Their Bonkverse profile. Link to it when you show their data |
-| `skin` | object or `null` | The skin they last wore in game, when Bonkverse has seen it. [Where it comes from](../data-and-privacy.md#skins). Can be set even when `status` is `not_found` |
-| `skin.skin_code` | string | The bonk.io skin code (base64), the same code bonk.io stores |
+| `skin` | object or `null` | Images of the skin they last wore in game, when Bonkverse has seen it. [Where it comes from](../data-and-privacy.md#skins). Can be set even when `status` is `not_found` |
 | `skin.image_url` | URL | The skin as a 512 × 512 PNG |
 | `skin.thumbnail_url` | URL | The skin as a 128 × 128 PNG, for avatars |
 | `skin.seen_at` | ISO 8601 time | When Bonkverse saw them wearing it |

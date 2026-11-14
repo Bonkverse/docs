@@ -3,6 +3,14 @@ title: Changelog
 description: Changes to the Bonkverse API.
 ---
 
+## Skin images only (November 2026)
+
+- **Removed** `skin.skin_code`, a few hours after `skin` was added.
+  `skin` keeps `image_url`, `thumbnail_url` and `seen_at`. A skin code is
+  the skin itself, so the API shows skins without handing them out. See
+  [Skins](data-and-privacy.md#skins). This is the one time a v1 field has
+  been removed; it was live for an afternoon.
+
 ## Skins from replays (November 2026)
 
 - `skin` now comes from replays too, so every registered player with
@@ -11,8 +19,8 @@ description: Changes to the Bonkverse API.
 
 ## Skins (November 2026)
 
-- Each player object has a `skin`: the skin code they last wore, a 512 px
-  image, a 128 px thumbnail and when it was seen. `null` until Bonkverse
+- Each player object has a `skin`: the skin code they last wore (removed
+  since, see above), a 512 px image, a 128 px thumbnail and when it was seen. `null` until Bonkverse
   has seen the player wear one, which for now means they signed in to
   Bonkverse. See [Skins](data-and-privacy.md#skins).
 
