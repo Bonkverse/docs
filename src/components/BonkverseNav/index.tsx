@@ -57,8 +57,35 @@ export function ThemePicker({mobile}: ItemProps): ReactNode {
 }
 
 /** Your bonkverse.io account (its session cookie covers .bonkverse.io). */
+type Account = {username: string; avatar: string | null};
+
+// Lucide's circle-user (ISC licence), shown under the skin picture and when
+// there is none, as in the shared header on the other sites.
+function UserIcon(): ReactNode {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="10" r="3" />
+      <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
+    </svg>
+  );
+}
+
+/**
+ * Your bonkverse.io account (its session cookie covers .bonkverse.io): your
+ * name and worn skin from /api/me/, or Log in.
+ */
 export function AccountLink({mobile}: ItemProps): ReactNode {
-  const [username, setUsername] = useState<string | null>(null);
+  const [account, setAccount] = useState<Account | null>(null);
   const [here, setHere] = useState('https://docs.bonkverse.io/');
 
   useEffect(() => {
@@ -67,7 +94,9 @@ export function AccountLink({mobile}: ItemProps): ReactNode {
     fetch(`${SITE}/api/me/`, {credentials: 'include'})
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (live && data?.authenticated) setUsername(data.user.username);
+        if (live && data?.authenticated) {
+          setAccount({username: data.user.username, avatar: data.user.avatar ?? null});
+        }
       })
       .catch(() => null); // signed out, offline or not allowed: show Log in
     return () => {
@@ -75,12 +104,25 @@ export function AccountLink({mobile}: ItemProps): ReactNode {
     };
   }, []);
 
-  const href = username
-    ? `${SITE}/player/${encodeURIComponent(username)}/`
+  const href = account
+    ? `${SITE}/player/${encodeURIComponent(account.username)}/`
     : `${SITE}${nav.account.signedOut.href}?next=${encodeURIComponent(here)}`;
   const link = (
-    <a className={mobile ? 'menu__link' : 'navbar__item navbar__link'} href={href}>
-      {username ?? nav.account.signedOut.label}
+    <a className={clsx(mobile ? 'menu__link' : 'navbar__item navbar__link', account && styles.account)} href={href}>
+      {account &&
+        (account.avatar ? (
+          // Their worn skin, as on bonkverse.io's header; the icon underneath
+          // shows if the picture can't load.
+          <span
+            className={styles.avatar}
+            style={{'--skin': `url("${account.avatar}")`} as React.CSSProperties}
+            aria-hidden="true">
+            <UserIcon />
+          </span>
+        ) : (
+          <UserIcon />
+        ))}
+      {account?.username ?? nav.account.signedOut.label}
     </a>
   );
   return mobile ? <li className="menu__list-item">{link}</li> : link;
