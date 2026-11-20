@@ -2,8 +2,13 @@
 
 The platform-wide docs site from RFC-0001, published at
 **[docs.bonkverse.io](https://docs.bonkverse.io)**. Built with
-[Docusaurus](https://docusaurus.io/) and themed like the replay site
-(`src/css/custom.css`).
+[Docusaurus](https://docusaurus.io/). Its look comes from
+[Bonkverse/ui](https://github.com/Bonkverse/ui) (RFC-0002), like bonkverse.io
+and the replay site: the color tokens and three themes, Jost, and the header
+and footer links from the package's `nav.json` (`docusaurus.config.ts`,
+`src/css/custom.css`, `src/components/BonkverseNav`). To take a new release,
+change the version in the `@bonkverse/ui` URL in `package.json` and run
+`npm install`.
 
 ## What lives where
 
