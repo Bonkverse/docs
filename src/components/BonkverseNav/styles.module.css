@@ -1,0 +1,15 @@
+/* The package's .bv-theme-picker is styled for its dark header; these only
+   fit it into Docusaurus's navbar and its phone menu, which uses page colors. */
+.picker {
+  display: inline-flex;
+}
+
+.mobile {
+  padding: 0.4rem 0.75rem;
+  color: var(--bv-muted);
+}
+
+.mobile select {
+  border-color: var(--bv-control);
+  color: var(--bv-text);
+}

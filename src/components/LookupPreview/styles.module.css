@@ -1,7 +1,7 @@
 .preview {
   margin: 1.5rem 0 2.2rem;
   max-width: 520px;
-  background: var(--bv-panel);
+  background: var(--bv-card);
   border: 1px solid var(--bv-outline);
   border-radius: 12px;
   overflow: hidden;
@@ -12,7 +12,7 @@
   align-items: center;
   gap: 0.6rem;
   padding: 0.7rem 1rem;
-  background: var(--bv-inset);
+  background: var(--bv-thumb);
   border-bottom: 1px solid var(--bv-outline);
 }
 .request code {
@@ -27,8 +27,9 @@
   font-weight: 700;
   padding: 0.1rem 0.45rem;
   border-radius: 6px;
-  background: var(--bv-link);
-  color: var(--bv-action-ink);
+  border: 1px solid var(--bv-link);
+  background: var(--bv-selected);
+  color: var(--bv-text);
 }
 
 .list {
@@ -60,7 +61,7 @@
 }
 .level {
   font-weight: 700;
-  color: var(--bv-action);
+  color: var(--bv-link);
   font-variant-numeric: tabular-nums;
 }
 .seen {

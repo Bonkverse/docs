@@ -1,129 +1,198 @@
-/* Bonkverse developer docs theme.
+/* Bonkverse docs theme.
  *
- * Same tokens as the replay site (ReplayRenderer browser/dev.css) so the
- * docs read as part of Bonkverse: deep navy canvas, raised panels, bonk.io's
- * own Futura PT, teal for actions, soft blue for links.
+ * Colors come only from Bonkverse/ui's tokens (tokens.css, loaded first in
+ * docusaurus.config.ts), so the docs follow the same three themes as
+ * bonkverse.io and the replay site: Bonkverse, Bonkverse Light and Bonkverse
+ * Dark, set on <html data-bv-theme>. Docusaurus's own light/dark mode
+ * follows along (Light → light), so Infima's built-in greys match too.
+ * Text is Jost (src/css/jost.css). Teal is for links and what is selected;
+ * the navbar is the shared Bonkverse header.
  */
 
-@font-face {
-  font-family: 'Futura PT';
-  src: url('/fonts/fptbook.otf') format('opentype');
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Futura PT';
-  src: url('/fonts/fptmed.otf') format('opentype');
-  font-weight: 500;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Futura PT';
-  src: url('/fonts/fptb.otf') format('opentype');
-  font-weight: 700;
-  font-display: swap;
-}
-
-:root {
-  --bv-canvas: #141f2b;
-  --bv-panel: #1c2d40;
-  --bv-panel-2: #22364c;
-  --bv-inset: #101a25;
-  --bv-outline: #354a5f;
-  --bv-text: #edf4fb;
-  --bv-muted: #aec1d3;
-  --bv-action: #47d8c4;
-  --bv-action-ink: #08201d;
-  --bv-action-tint: rgba(71, 216, 196, 0.12);
-  --bv-link: #90b7ff;
-  --bv-danger: #ff8a80;
-  --bv-gold: #ffc107;
-}
-
-/* The site is dark-only (colorMode.disableSwitch), so tokens go on both. */
 :root,
 [data-theme='dark'] {
-  --ifm-font-family-base: 'Futura PT', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --ifm-heading-font-family: var(--ifm-font-family-base);
-  --ifm-font-family-monospace: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --ifm-font-family-base: var(--bv-font);
+  --ifm-heading-font-family: var(--bv-font);
+  --ifm-font-family-monospace: var(--bv-mono);
   --ifm-font-size-base: 17px;
   --ifm-line-height-base: 1.6;
-  --ifm-heading-font-weight: 500;
-  --ifm-font-weight-bold: 500;
+  --ifm-heading-font-weight: 600;
+  --ifm-font-weight-bold: 600;
 
-  --ifm-background-color: var(--bv-canvas);
-  --ifm-background-surface-color: var(--bv-panel);
+  --ifm-background-color: var(--bv-page);
+  --ifm-background-surface-color: var(--bv-card);
   --ifm-font-color-base: var(--bv-text);
   --ifm-font-color-secondary: var(--bv-muted);
+  --ifm-color-content: var(--bv-text);
   --ifm-color-content-secondary: var(--bv-muted);
-  --ifm-heading-color: var(--bv-text);
+  --ifm-heading-color: var(--bv-heading);
 
-  --ifm-color-primary: #47d8c4;
-  --ifm-color-primary-dark: #30d1bb;
-  --ifm-color-primary-darker: #2bc6b1;
-  --ifm-color-primary-darkest: #23a392;
-  --ifm-color-primary-light: #5edfcd;
-  --ifm-color-primary-lighter: #6ae1d1;
-  --ifm-color-primary-lightest: #8de8dc;
+  /* Infima derives button and badge shades from these; all are the link teal */
+  --ifm-color-primary: var(--bv-link);
+  --ifm-color-primary-dark: var(--bv-link);
+  --ifm-color-primary-darker: var(--bv-link);
+  --ifm-color-primary-darkest: var(--bv-link);
+  --ifm-color-primary-light: var(--bv-link);
+  --ifm-color-primary-lighter: var(--bv-link);
+  --ifm-color-primary-lightest: var(--bv-link);
 
   --ifm-link-color: var(--bv-link);
-  --ifm-link-hover-color: #b5cfff;
+  --ifm-link-hover-color: var(--bv-link);
   --ifm-link-hover-decoration: underline;
+  --ifm-hover-overlay: var(--bv-hover);
 
-  --ifm-navbar-background-color: rgba(20, 31, 43, 0.92);
-  --ifm-navbar-height: 60px;
-  --ifm-footer-background-color: var(--bv-inset);
+  --ifm-navbar-background-color: var(--bv-header);
+  --ifm-navbar-height: var(--bv-header-height);
+  --ifm-navbar-link-color: var(--bv-header-title);
+  --ifm-navbar-link-hover-color: var(--bv-header-title);
+  --ifm-navbar-link-active-color: var(--bv-header-link);
+  --ifm-navbar-shadow: none;
+  --ifm-footer-background-color: var(--bv-page);
+  --ifm-footer-color: var(--bv-muted);
+  --ifm-footer-link-color: var(--bv-link);
+  --ifm-footer-link-hover-color: var(--bv-link);
+  --ifm-footer-title-color: var(--bv-text);
+  --ifm-dropdown-background-color: var(--bv-card);
+  --ifm-dropdown-link-color: var(--bv-text);
+  --ifm-dropdown-hover-background-color: var(--bv-hover);
+
   --ifm-toc-border-color: var(--bv-outline);
   --ifm-hr-border-color: var(--bv-outline);
   --ifm-table-border-color: var(--bv-outline);
-  --ifm-table-stripe-background: rgba(255, 255, 255, 0.02);
-  --ifm-table-head-background: var(--bv-panel);
+  --ifm-table-stripe-background: transparent;
+  --ifm-table-head-background: var(--bv-card);
 
   --ifm-menu-color: var(--bv-muted);
-  --ifm-menu-color-active: var(--bv-action);
-  --ifm-menu-color-background-active: var(--bv-action-tint);
-  --ifm-menu-color-background-hover: rgba(255, 255, 255, 0.04);
+  --ifm-menu-color-active: var(--bv-text);
+  --ifm-menu-color-background-active: var(--bv-selected);
+  --ifm-menu-color-background-hover: var(--bv-hover);
 
-  --ifm-code-background: var(--bv-inset);
-  --ifm-code-border-radius: 6px;
+  --ifm-code-background: var(--bv-thumb);
+  --ifm-code-border-radius: var(--bv-radius-sm);
   --ifm-code-font-size: 88%;
-  --prism-background-color: var(--bv-inset);
-  --docusaurus-highlighted-code-line-bg: rgba(71, 216, 196, 0.1);
+  --prism-background-color: var(--bv-thumb);
+  --docusaurus-highlighted-code-line-bg: var(--bv-selected);
 
-  --ifm-global-radius: 8px;
+  --ifm-global-radius: var(--bv-radius);
   --ifm-card-border-radius: 12px;
-  --ifm-tabs-color-active: var(--bv-action);
-  --ifm-tabs-color-active-border: var(--bv-action);
+  --ifm-tabs-color-active: var(--bv-text);
+  --ifm-tabs-color-active-border: var(--bv-link);
 
-  --ifm-color-info-contrast-background: #172b44;
+  /* Admonitions: the card surface with a colored edge */
+  --ifm-alert-background-color: var(--bv-card);
+  --ifm-color-info-contrast-background: var(--bv-card);
+  --ifm-color-info-contrast-foreground: var(--bv-text);
   --ifm-color-info-dark: var(--bv-link);
-  --ifm-color-warning-contrast-background: #33290f;
+  --ifm-color-note-contrast-background: var(--bv-card);
+  --ifm-color-secondary-contrast-background: var(--bv-card);
+  --ifm-color-secondary-contrast-foreground: var(--bv-text);
+  --ifm-color-success-contrast-background: var(--bv-success);
+  --ifm-color-success-contrast-foreground: var(--bv-text);
+  --ifm-color-success-dark: var(--bv-link);
+  --ifm-color-warning-contrast-background: var(--bv-card);
+  --ifm-color-warning-contrast-foreground: var(--bv-text);
   --ifm-color-warning-dark: var(--bv-gold);
-  --ifm-color-danger-contrast-background: #3a1d1d;
+  --ifm-color-danger-contrast-background: var(--bv-danger-surface);
+  --ifm-color-danger-contrast-foreground: var(--bv-text);
   --ifm-color-danger-dark: var(--bv-danger);
-  --ifm-color-success-contrast-background: #10302c;
-  --ifm-color-success-dark: var(--bv-action);
 }
 
 body {
-  background: radial-gradient(1200px 600px at 10% -10%, #1a3448 0%, var(--bv-canvas) 55%) fixed,
-    var(--bv-canvas);
+  background: var(--bv-page);
 }
+
+/* ─── Navbar: the shared Bonkverse header ─────────────────────────────── */
 
 .navbar {
   border-bottom: 1px solid var(--bv-outline);
-  backdrop-filter: blur(8px);
   box-shadow: none;
 }
-.navbar__title {
-  font-weight: 500;
-  letter-spacing: 0.01em;
+.navbar__brand {
+  color: var(--bv-header-title);
 }
-.navbar__logo img {
-  border-radius: 50%;
+.navbar__title {
+  font-size: var(--bv-text-lg);
+  font-weight: 700;
+}
+.navbar__logo {
+  height: 30px;
+  margin-right: var(--bv-space-2);
+}
+.navbar__items--right {
+  gap: var(--bv-space-2);
+}
+.navbar__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--bv-target);
+  padding: 0 var(--bv-space-3);
+  border-radius: var(--bv-radius);
+  font-size: var(--bv-text-sm);
+  font-weight: 600;
+}
+.navbar__link:hover {
+  background: color-mix(in srgb, var(--bv-header-title) 16%, transparent);
+  text-decoration: none;
+}
+.navbar__link--active {
+  color: var(--bv-header-link);
+  background: color-mix(in srgb, var(--bv-header-link) 14%, transparent);
+}
+.navbar__link--active:hover {
+  background: color-mix(in srgb, var(--bv-header-link) 26%, transparent);
+}
+/* The links sit centered between the brand and the right-hand group, like
+   the shared header's. */
+.navbar__items:not(.navbar__items--right) {
+  gap: var(--bv-space-1);
+}
+.navbar__brand {
+  margin-right: auto;
+}
+.navbar__items:not(.navbar__items--right) > .navbar__item:last-child {
+  margin-right: auto;
+}
+.navbar__items--right {
+  flex: 0 0 auto;
+}
+.navbar__toggle {
+  color: var(--bv-header-title);
+}
+.navbar .dropdown__menu {
+  border: 1px solid var(--bv-outline);
+  box-shadow: var(--bv-shadow);
+}
+.dropdown__link {
+  font-size: var(--bv-text-sm);
+  font-weight: 500;
+}
+/* Phones and tablets: the items move into Docusaurus's menu (the rules
+   above would otherwise show them in the bar). */
+@media (max-width: 996px) {
+  .navbar__items .navbar__item {
+    display: none;
+  }
+}
+/* External-link arrows: almost every header and footer link leaves the
+   docs, so they're noise (bonkverse.io's own footer has none) */
+.navbar svg[class*='iconExternalLink'],
+.footer svg[class*='iconExternalLink'] {
+  display: none;
 }
 
-/* Docs body */
+/* Phone menu: page colors, not the header's */
+.navbar-sidebar {
+  background: var(--bv-page);
+}
+.navbar-sidebar__brand {
+  background: var(--bv-header);
+}
+.navbar-sidebar .menu__link--active {
+  color: var(--bv-text);
+}
+
+/* ─── Docs body ─────────────────────────────────────────────────────────── */
+
 .markdown h1 {
   font-size: 2.4rem;
   letter-spacing: -0.01em;
@@ -138,7 +207,7 @@ body {
 
 code {
   border: 1px solid var(--bv-outline);
-  color: #e6edf5;
+  color: var(--bv-text);
 }
 a code {
   color: inherit;
@@ -168,8 +237,11 @@ a code {
   font-weight: 500;
   color: var(--bv-muted);
 }
+.tabs__item:hover {
+  background: var(--bv-hover);
+}
 .tabs__item--active {
-  color: var(--bv-action);
+  color: var(--bv-text);
 }
 .tabs-container .theme-code-block {
   border-top-left-radius: 0;
@@ -192,7 +264,7 @@ a code {
 }
 .markdown table th {
   text-align: left;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--bv-muted);
 }
 .markdown table td,
@@ -200,7 +272,7 @@ a code {
   border-color: var(--bv-outline);
 }
 
-/* Admonitions: flat panels with a coloured edge. */
+/* Admonitions: flat panels with a colored edge. */
 .theme-admonition {
   border: 1px solid var(--bv-outline);
   border-left-width: 4px;
@@ -208,13 +280,17 @@ a code {
 }
 
 .menu__link {
-  border-radius: 8px;
+  border-radius: var(--bv-radius);
+}
+.menu__link--active:not(.menu__link--sublist) {
+  box-shadow: inset 2px 0 0 var(--bv-link);
 }
 .menu__list-item-collapsible:hover {
   background: none;
 }
 .table-of-contents__link--active {
-  color: var(--bv-action);
+  color: var(--bv-link);
+  font-weight: 600;
 }
 
 /* Method badges in endpoint headings: <span class="method get">GET</span> */
@@ -224,22 +300,22 @@ a code {
   font-size: 0.78rem;
   font-weight: 700;
   padding: 0.12rem 0.5rem;
+  border: 1px solid var(--bv-link);
   border-radius: 6px;
   vertical-align: 0.2em;
   margin-right: 0.5rem;
-  color: var(--bv-action-ink);
-}
-.method.get {
-  background: var(--bv-action);
+  background: var(--bv-selected);
+  color: var(--bv-text);
 }
 .method.post {
-  background: var(--bv-link);
+  border-color: var(--bv-control);
+  background: var(--bv-card);
 }
 
 .endpoint {
   font-family: var(--ifm-font-family-monospace);
   font-size: 1rem;
-  background: var(--bv-inset);
+  background: var(--bv-thumb);
   border: 1px solid var(--bv-outline);
   border-radius: 8px;
   padding: 0.6rem 0.9rem;
@@ -248,15 +324,21 @@ a code {
   white-space: nowrap;
 }
 
+/* ─── Footer: the shared Bonkverse footer's columns ─────────────────────── */
+
 .footer {
   border-top: 1px solid var(--bv-outline);
+  font-size: var(--bv-text-sm);
+}
+.footer__title {
+  font-size: var(--bv-text-sm);
 }
 .footer__copyright {
   color: var(--bv-muted);
-  font-size: 0.9rem;
+  font-size: var(--bv-text-xs);
 }
 
 :focus-visible {
-  outline: 2px solid var(--bv-action);
+  outline: 2px solid var(--bv-link);
   outline-offset: 2px;
 }
