@@ -99,6 +99,16 @@
 
 body {
   background: var(--bv-page);
+  /* ss01: Jost's Futura-style single-story "a", as in @bonkverse/ui base.css */
+  font-feature-settings: "ss01" 1;
+}
+/* Monospace fonts keep their usual letters. */
+code,
+kbd,
+pre,
+.method,
+.endpoint {
+  font-feature-settings: normal;
 }
 
 /* ─── Navbar: the shared Bonkverse header ─────────────────────────────── */
