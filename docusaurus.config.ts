@@ -95,6 +95,7 @@ const config: Config = {
           customCss: [
             require.resolve('@bonkverse/ui/tokens.css'),
             require.resolve('@bonkverse/ui/components.css'),
+            require.resolve('@bonkverse/ui/seasons.css'),
             './src/css/jost.css',
             './src/css/custom.css',
           ],
@@ -126,6 +127,7 @@ const config: Config = {
       items: [
         ...headerItems,
         {type: 'custom-bvTheme', position: 'right'},
+        {type: 'custom-bvSeason', position: 'right'},
         {type: 'custom-bvAccount', position: 'right'},
       ],
     },

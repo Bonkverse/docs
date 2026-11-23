@@ -16,7 +16,12 @@ const THEMES: [string, string][] = [
 // Set by Bonkverse/ui's theme.js, inlined into <head> (docusaurus.config.ts).
 declare global {
   interface Window {
-    BonkverseTheme?: {get(): string; set(theme: string): void};
+    BonkverseTheme?: {
+      get(): string;
+      set(theme: string): void;
+      season?(): string | null;
+      setSeasonal?(on: boolean): void;
+    };
   }
 }
 
@@ -54,6 +59,34 @@ export function ThemePicker({mobile}: ItemProps): ReactNode {
     </label>
   );
   return mobile ? <li className="menu__list-item">{picker}</li> : picker;
+}
+
+/**
+ * The "Seasonal theme" switch (Bonkverse/ui seasons.css). The package's CSS
+ * shows it only while a season is on the calendar; the choice is shared with
+ * every Bonkverse site.
+ */
+export function SeasonToggle({mobile}: ItemProps): ReactNode {
+  const [on, setOn] = useState(true);
+
+  useEffect(() => {
+    setOn(window.BonkverseTheme?.season?.() != null);
+    const onChange = (e: Event) => setOn((e as CustomEvent<{season: string | null}>).detail.season != null);
+    document.addEventListener('bv:seasonchange', onChange);
+    return () => document.removeEventListener('bv:seasonchange', onChange);
+  }, []);
+
+  const toggle = (
+    <label className={clsx('bv-season-toggle', !mobile && 'navbar__item', mobile && styles.mobile)}>
+      <input
+        type="checkbox"
+        checked={on}
+        onChange={(e) => window.BonkverseTheme?.setSeasonal?.(e.target.checked)}
+      />
+      <span>Seasonal theme</span>
+    </label>
+  );
+  return mobile ? <li className="menu__list-item">{toggle}</li> : toggle;
 }
 
 /** Your bonkverse.io account (its session cookie covers .bonkverse.io). */

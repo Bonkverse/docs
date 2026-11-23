@@ -42,3 +42,14 @@
   border-radius: 50%;
   background: var(--skin) center / cover no-repeat;
 }
+
+/* In the phone menu the season switch sits on page colors, not the header's. */
+:global([data-bv-season-now]) .mobile:global(.bv-season-toggle) {
+  display: flex;
+  gap: var(--bv-space-2);
+  color: var(--bv-muted);
+}
+:global([data-bv-season-now]) .mobile:global(.bv-season-toggle) input {
+  color: var(--bv-text);
+  accent-color: var(--bv-link);
+}
