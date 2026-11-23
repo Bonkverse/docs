@@ -354,3 +354,14 @@ a code {
   outline: 2px solid var(--bv-link);
   outline-offset: 2px;
 }
+
+/* The Appearance button (src/components/BonkverseNav) is a <button>, so it
+   needs the browser's button look taken off to match the navbar links. */
+.bv-appearance > button.navbar__link {
+  justify-content: center;
+  min-width: var(--bv-target);
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}

@@ -1,6 +1,6 @@
-// The Bonkverse theme picker and account link for the docs navbar, matching
+// The Bonkverse Appearance menu and account link for the docs navbar, matching
 // the shared header on bonkverse.io and replays.bonkverse.io.
-import React, {useEffect, useState, type ReactNode} from 'react';
+import React, {useEffect, useRef, useState, type ReactNode} from 'react';
 import clsx from 'clsx';
 import {useColorMode} from '@docusaurus/theme-common';
 import nav from '@bonkverse/ui/nav.json';
@@ -16,14 +16,20 @@ const THEMES: [string, string][] = [
 // Set by Bonkverse/ui's theme.js, inlined into <head> (docusaurus.config.ts).
 declare global {
   interface Window {
-    BonkverseTheme?: {get(): string; set(theme: string): void};
+    BonkverseTheme?: {
+      get(): string;
+      set(theme: string): void;
+      season?(): string | null;
+      setSeasonal?(on: boolean): void;
+    };
   }
 }
 
 type ItemProps = {mobile?: boolean};
 
-/** The three Bonkverse themes; Light shows Docusaurus's light mode. */
-export function ThemePicker({mobile}: ItemProps): ReactNode {
+/** The saved theme, kept in step with Docusaurus's own light/dark mode
+ * (Light shows Docusaurus's light mode). */
+function useBvTheme(): string {
   const {setColorMode} = useColorMode();
   const [theme, setTheme] = useState('bonkverse');
 
@@ -38,22 +44,133 @@ export function ThemePicker({mobile}: ItemProps): ReactNode {
     return () => document.removeEventListener('bv:themechange', onChange);
   }, [setColorMode]);
 
-  const picker = (
-    <label className={clsx('bv-theme-picker', !mobile && 'navbar__item', styles.picker, mobile && styles.mobile)}>
-      <span>Theme</span>
-      <select
-        value={theme}
-        onChange={(e) => window.BonkverseTheme?.set(e.target.value)}
-      >
-        {THEMES.map(([value, label]) => (
-          <option key={value} value={value}>
-            {label}
-          </option>
-        ))}
-      </select>
+  return theme;
+}
+
+/** Whether seasonal themes are on (Bonkverse/ui seasons.css). */
+function useBvSeasonal(): boolean {
+  const [on, setOn] = useState(true);
+
+  useEffect(() => {
+    setOn(window.BonkverseTheme?.season?.() != null);
+    const onChange = (e: Event) => setOn((e as CustomEvent<{season: string | null}>).detail.season != null);
+    document.addEventListener('bv:seasonchange', onChange);
+    return () => document.removeEventListener('bv:seasonchange', onChange);
+  }, []);
+
+  return on;
+}
+
+function ThemeSelect({className}: {className?: string}): ReactNode {
+  const theme = useBvTheme();
+  return (
+    <select className={className} value={theme} onChange={(e) => window.BonkverseTheme?.set(e.target.value)}>
+      {THEMES.map(([value, label]) => (
+        <option key={value} value={value}>
+          {label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+/** "Seasonal theme": the package's CSS shows it only while a season is on
+ * the calendar; the choice is shared with every Bonkverse site. */
+function SeasonToggle({className}: {className?: string}): ReactNode {
+  const on = useBvSeasonal();
+  return (
+    <label className={clsx('bv-season-toggle', className)}>
+      <input
+        type="checkbox"
+        checked={on}
+        onChange={(e) => window.BonkverseTheme?.setSeasonal?.(e.target.checked)}
+      />
+      <span>Seasonal theme</span>
     </label>
   );
-  return mobile ? <li className="menu__list-item">{picker}</li> : picker;
+}
+
+// Lucide's palette (ISC licence).
+function PaletteIcon(): ReactNode {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true">
+      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.65-.75 1.65-1.69 0-.44-.18-.84-.44-1.13-.29-.29-.44-.65-.44-1.13a1.64 1.64 0 0 1 1.67-1.67h2c3.05 0 5.55-2.5 5.55-5.55C21.97 6.01 17.46 2 12 2z" />
+      <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+      <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+      <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
+      <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+    </svg>
+  );
+}
+
+/**
+ * Appearance: as on bonkverse.io and the replay site, one palette button in
+ * the navbar whose menu holds the theme and, in season, the seasonal switch
+ * (Bonkverse/ui .bv-appearance). In the phone menu the two sit in the list.
+ */
+export function AppearanceMenu({mobile}: ItemProps): ReactNode {
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onClick = (e: MouseEvent) => {
+      if (box.current && !box.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('click', onClick);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('click', onClick);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  if (mobile) {
+    return (
+      <>
+        <li className="menu__list-item">
+          <label className={clsx('bv-theme-picker', styles.picker, styles.mobile)}>
+            <span>Theme</span>
+            <ThemeSelect />
+          </label>
+        </li>
+        <li className="menu__list-item">
+          <SeasonToggle className={styles.mobile} />
+        </li>
+      </>
+    );
+  }
+
+  return (
+    <div className="navbar__item bv-dropdown bv-appearance" ref={box}>
+      <button
+        className="navbar__link"
+        type="button"
+        aria-expanded={open}
+        aria-controls="bv-appearance"
+        aria-label="Appearance"
+        onClick={() => setOpen(!open)}>
+        <PaletteIcon />
+      </button>
+      <div className="bv-menu bv-menu--end bv-appearance__menu" id="bv-appearance" hidden={!open}>
+        <label className="bv-appearance__field">
+          <span>Theme</span>
+          <ThemeSelect className="bv-input bv-select" />
+        </label>
+        <SeasonToggle />
+      </div>
+    </div>
+  );
 }
 
 /** Your bonkverse.io account (its session cookie covers .bonkverse.io). */
