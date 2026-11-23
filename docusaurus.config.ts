@@ -107,7 +107,7 @@ const config: Config = {
   themeConfig: {
     image: 'logo.png',
     colorMode: {
-      // Follows the Bonkverse theme picker in the navbar (Light → light, the
+      // Follows the Bonkverse theme in the navbar's Appearance menu (Light → light, the
       // others → dark); Docusaurus's own toggle is hidden
       // (src/theme/ColorModeToggle).
       defaultMode: 'dark',
@@ -126,8 +126,7 @@ const config: Config = {
       },
       items: [
         ...headerItems,
-        {type: 'custom-bvTheme', position: 'right'},
-        {type: 'custom-bvSeason', position: 'right'},
+        {type: 'custom-bvAppearance', position: 'right'},
         {type: 'custom-bvAccount', position: 'right'},
       ],
     },
