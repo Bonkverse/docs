@@ -15,7 +15,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@bonkverse/ui": "https://github.com/Bonkverse/ui/archive/refs/tags/v0.1.5.tar.gz",
+    "@bonkverse/ui": "https://github.com/Bonkverse/ui/archive/refs/tags/v0.1.6.tar.gz",
     "@docusaurus/core": "3.10.2",
     "@docusaurus/faster": "3.10.2",
     "@docusaurus/preset-classic": "3.10.2",

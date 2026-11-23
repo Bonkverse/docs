@@ -114,7 +114,6 @@ pre,
 /* ─── Navbar: the shared Bonkverse header ─────────────────────────────── */
 
 .navbar {
-  border-bottom: 1px solid var(--bv-outline);
   box-shadow: none;
 }
 .navbar__brand {
@@ -169,7 +168,7 @@ pre,
   color: var(--bv-header-title);
 }
 .navbar .dropdown__menu {
-  border: 1px solid var(--bv-outline);
+  border: 1px solid transparent;
   box-shadow: var(--bv-shadow);
 }
 .dropdown__link {
@@ -216,14 +215,14 @@ pre,
 }
 
 code {
-  border: 1px solid var(--bv-outline);
+  border: 1px solid transparent;
   color: var(--bv-text);
 }
 a code {
   color: inherit;
 }
 .theme-code-block {
-  border: 1px solid var(--bv-outline);
+  border: 1px solid transparent;
   box-shadow: none !important;
 }
 .theme-code-block code {
@@ -282,11 +281,15 @@ a code {
   border-color: var(--bv-outline);
 }
 
-/* Admonitions: flat panels with a colored edge. */
+/* Admonitions: the inset fill, like Bonkverse/ui notices; the icon and
+   title say which kind. Danger keeps a red border. */
 .theme-admonition {
-  border: 1px solid var(--bv-outline);
-  border-left-width: 4px;
+  border: 1px solid transparent;
+  background: var(--bv-inset);
   box-shadow: none;
+}
+.theme-admonition.alert--danger {
+  border-color: var(--bv-danger);
 }
 
 .menu__link {
@@ -310,7 +313,7 @@ a code {
   font-size: 0.78rem;
   font-weight: 700;
   padding: 0.12rem 0.5rem;
-  border: 1px solid var(--bv-link);
+  border: 1px solid transparent;
   border-radius: 6px;
   vertical-align: 0.2em;
   margin-right: 0.5rem;
@@ -318,15 +321,14 @@ a code {
   color: var(--bv-text);
 }
 .method.post {
-  border-color: var(--bv-control);
-  background: var(--bv-card);
+  background: var(--bv-inset);
 }
 
 .endpoint {
   font-family: var(--ifm-font-family-monospace);
   font-size: 1rem;
   background: var(--bv-thumb);
-  border: 1px solid var(--bv-outline);
+  border: 1px solid transparent;
   border-radius: 8px;
   padding: 0.6rem 0.9rem;
   margin-bottom: 1.4rem;
