@@ -355,13 +355,37 @@ a code {
   outline-offset: 2px;
 }
 
-/* The Appearance button (src/components/BonkverseNav) is a <button>, so it
-   needs the browser's button look taken off to match the navbar links. */
-.bv-appearance > button.navbar__link {
+/* The Appearance and account-menu buttons (src/components/BonkverseNav) are
+   <button>s, so they need the browser's button look taken off to match the
+   navbar links. */
+.bv-appearance > button.navbar__link,
+.bv-header__account > button.navbar__link {
   justify-content: center;
   min-width: var(--bv-target);
   border: 0;
   background: none;
   font: inherit;
   cursor: pointer;
+}
+
+/* The account name and its menu chevron read as one split button, as in the
+   shared header (Bonkverse/ui components.css, .bv-header__account). */
+.bv-header__account {
+  display: inline-flex;
+  align-items: center;
+}
+.bv-header__account > a.navbar__link {
+  padding-right: var(--bv-space-1);
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.bv-header__account > button.navbar__link {
+  padding: 0 var(--bv-space-2);
+  color: inherit;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.bv-header__account > button.navbar__link svg {
+  width: 18px;
+  height: 18px;
 }
