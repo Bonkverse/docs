@@ -10,8 +10,13 @@ import {
   otherAccounts,
   signInHref,
   switchAccount,
+  type BonkverseAccount,
   type BonkverseMe,
 } from '@bonkverse/ui/account.mjs';
+
+// bonkverse.io's /api/me/ also sends each account's worn-skin picture
+// (Bonkverse/bonkverse#178); Bonkverse/ui's types gain it in its next release.
+type AccountWithAvatar = BonkverseAccount & {avatar?: string | null};
 import styles from './styles.module.css';
 
 const SITE = 'https://bonkverse.io';
@@ -260,7 +265,10 @@ function Avatar({src}: {src: string | null}): ReactNode {
       <UserIcon />
     </span>
   ) : (
-    <UserIcon />
+    // Same box as a picture, so names line up in the switcher.
+    <span className={styles.avatar} aria-hidden="true">
+      <UserIcon />
+    </span>
   );
 }
 
@@ -301,10 +309,10 @@ function Switcher({me, here, mobile}: {me: BonkverseMe; here: string; mobile?: b
   };
 
   const itemClass = mobile ? clsx('menu__link', styles.mobileItem) : 'bv-menu__item';
-  const rows = others.map((account) => {
+  const rows = (others as AccountWithAvatar[]).map((account) => {
     const label = (
       <>
-        <UserIcon />
+        <Avatar src={account.avatar ?? null} />
         <span className="bv-menu__text">{account.username}</span>
         {account.signed_in && !account.connected && (
           <span className="bv-menu__badge" title="Wear will ask for this account's bonk.io password">
