@@ -79,7 +79,12 @@ const config: Config = {
     locales: ['en'],
   },
 
-  headTags: [{tagName: 'script', attributes: {}, innerHTML: themeScript}],
+  headTags: [
+    {tagName: 'script', attributes: {}, innerHTML: themeScript},
+    // The standard Bonkverse logo on an iPhone home screen (opaque: iOS fills
+    // transparency with black), as on bonkverse.io and the replay site.
+    {tagName: 'link', attributes: {rel: 'apple-touch-icon', href: '/apple-touch-icon.png'}},
+  ],
 
   // Serves the package's logo at /logo.png, the same file the other
   // Bonkverse sites show.
