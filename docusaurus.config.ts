@@ -53,7 +53,9 @@ const headerItems: NavbarItem[] = nav.header.map((item): NavbarItem => {
 const config: Config = {
   title: 'Bonkverse Docs',
   tagline: 'Docs for the Bonkverse platform and API',
-  favicon: 'img/favicon.png',
+  // The standard Bonkverse logo, as on bonkverse.io and the replay site
+  // (served from the package's img/, see staticDirectories).
+  favicon: 'logo.png',
 
   future: {
     v4: true,
