@@ -121,20 +121,38 @@ function PaletteIcon(): ReactNode {
 }
 
 /**
- * Appearance: as on bonkverse.io and the replay site, one palette button in
- * the navbar whose menu holds the theme and, in season, the seasonal switch
- * (Bonkverse/ui .bv-appearance). In the phone menu the two sit in the list.
+ * Open/close for a navbar menu, as Bonkverse/ui's ui.js does for the shared
+ * header: one menu open at a time, a click outside or Escape closes it, and
+ * Escape puts focus back on its button.
  */
-export function AppearanceMenu({mobile}: ItemProps): ReactNode {
-  const [open, setOpen] = useState(false);
+const MENU_OPENED = 'bv-navbar-menu-opened';
+
+function useNavbarMenu(id: string) {
+  const [open, setOpenState] = useState(false);
   const box = useRef<HTMLDivElement>(null);
+  const button = useRef<HTMLButtonElement>(null);
+
+  const setOpen = (next: boolean) => {
+    setOpenState(next);
+    if (next) window.dispatchEvent(new CustomEvent(MENU_OPENED, {detail: id}));
+  };
+
+  useEffect(() => {
+    const onOther = (e: Event) => (e as CustomEvent<string>).detail !== id && setOpenState(false);
+    window.addEventListener(MENU_OPENED, onOther);
+    return () => window.removeEventListener(MENU_OPENED, onOther);
+  }, [id]);
 
   useEffect(() => {
     if (!open) return undefined;
     const onClick = (e: MouseEvent) => {
-      if (box.current && !box.current.contains(e.target as Node)) setOpen(false);
+      if (box.current && !box.current.contains(e.target as Node)) setOpenState(false);
     };
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setOpenState(false);
+      button.current?.focus();
+    };
     document.addEventListener('click', onClick);
     document.addEventListener('keydown', onKey);
     return () => {
@@ -142,6 +160,17 @@ export function AppearanceMenu({mobile}: ItemProps): ReactNode {
       document.removeEventListener('keydown', onKey);
     };
   }, [open]);
+
+  return {open, setOpen, box, button};
+}
+
+/**
+ * Appearance: as on bonkverse.io and the replay site, one palette button in
+ * the navbar whose menu holds the theme and, in season, the seasonal switch
+ * (Bonkverse/ui .bv-appearance). In the phone menu the two sit in the list.
+ */
+export function AppearanceMenu({mobile}: ItemProps): ReactNode {
+  const {open, setOpen, box, button} = useNavbarMenu('bv-appearance');
 
   if (mobile) {
     return (
@@ -162,6 +191,7 @@ export function AppearanceMenu({mobile}: ItemProps): ReactNode {
   return (
     <div className="navbar__item bv-dropdown bv-appearance" ref={box}>
       <button
+        ref={button}
         className="navbar__link"
         type="button"
         aria-expanded={open}
@@ -202,10 +232,12 @@ function UserIcon(): ReactNode {
   );
 }
 
-// Lucide's chevron-down (ISC licence).
+// Lucide's chevron-down (ISC licence). `bv-chevron`: the shared CSS turns
+// it when its button's menu is open.
 function ChevronIcon(): ReactNode {
   return (
     <svg
+      className="bv-chevron"
       width="20"
       height="20"
       viewBox="0 0 24 24"
@@ -335,8 +367,7 @@ function Switcher({me, here, mobile}: {me: BonkverseMe; here: string; mobile?: b
 export function AccountLink({mobile}: ItemProps): ReactNode {
   const [me, setMe] = useState<BonkverseMe | null>(null);
   const [here, setHere] = useState('https://docs.bonkverse.io/');
-  const [open, setOpen] = useState(false);
-  const box = useRef<HTMLDivElement>(null);
+  const {open, setOpen, box, button} = useNavbarMenu('bv-account');
 
   useEffect(() => {
     setHere(window.location.href);
@@ -346,20 +377,6 @@ export function AccountLink({mobile}: ItemProps): ReactNode {
       live = false;
     };
   }, []);
-
-  useEffect(() => {
-    if (!open) return undefined;
-    const onClick = (e: MouseEvent) => {
-      if (box.current && !box.current.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
-    document.addEventListener('click', onClick);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('click', onClick);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
 
   const account = me?.user ?? null;
   const href = account
@@ -401,6 +418,7 @@ export function AccountLink({mobile}: ItemProps): ReactNode {
     <div className="navbar__item bv-dropdown bv-header__account" ref={box}>
       {link}
       <button
+        ref={button}
         className="navbar__link"
         type="button"
         aria-label="Account menu"
@@ -412,6 +430,68 @@ export function AccountLink({mobile}: ItemProps): ReactNode {
       <div className="bv-menu bv-menu--end" id="bv-account" hidden={!open}>
         <Switcher me={me} here={here} />
         {menuLinks(here).map((item) => (
+          <a className="bv-menu__item" key={item.href} href={item.href}>
+            {item.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+type NavMenuProps = ItemProps & {
+  label: string;
+  items: {label: string; href: string}[];
+};
+
+/**
+ * A header menu from nav.json (Tools), as in the shared header on the other
+ * sites: a button with a chevron that turns when open, and the package's
+ * .bv-menu that rises into place. Opens on click, not hover. In the phone
+ * menu it opens in place in the list.
+ */
+export function NavMenu({label, items, mobile}: NavMenuProps): ReactNode {
+  const id = `bv-menu-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+  const {open, setOpen, box, button} = useNavbarMenu(id);
+
+  if (mobile) {
+    return (
+      <li className="menu__list-item">
+        <button
+          className={clsx('menu__link', styles.mobileItem)}
+          type="button"
+          aria-expanded={open}
+          aria-controls={id}
+          onClick={() => setOpen(!open)}>
+          <span className="bv-menu__text">{label}</span>
+          <ChevronIcon />
+        </button>
+        <ul className="menu__list" id={id} hidden={!open}>
+          {items.map((item) => (
+            <li className="menu__list-item" key={item.href}>
+              <a className="menu__link" href={item.href}>
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </li>
+    );
+  }
+
+  return (
+    <div className="navbar__item bv-dropdown" ref={box}>
+      <button
+        ref={button}
+        className="navbar__link"
+        type="button"
+        aria-expanded={open}
+        aria-controls={id}
+        onClick={() => setOpen(!open)}>
+        {label} <ChevronIcon />
+      </button>
+      <div className="bv-menu" id={id} hidden={!open}>
+        {items.map((item) => (
           <a className="bv-menu__item" key={item.href} href={item.href}>
             {item.label}
           </a>

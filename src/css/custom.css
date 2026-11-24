@@ -359,13 +359,22 @@ a code {
    <button>s, so they need the browser's button look taken off to match the
    navbar links. */
 .bv-appearance > button.navbar__link,
-.bv-header__account > button.navbar__link {
+.bv-header__account > button.navbar__link,
+.bv-dropdown > button.navbar__link {
   justify-content: center;
   min-width: var(--bv-target);
   border: 0;
   background: none;
   font: inherit;
+  /* `font: inherit` resets these; they match .navbar__link (above). */
+  font-size: var(--bv-text-sm);
+  font-weight: 600;
   cursor: pointer;
+  transition: background-color var(--bv-fade) ease-out, color var(--bv-fade) ease-out;
+}
+/* The reset above outranks .navbar__link:hover, so hover is restated. */
+.bv-dropdown > button.navbar__link:hover {
+  background: color-mix(in srgb, var(--bv-header-title) 16%, transparent);
 }
 
 /* The account name and its menu chevron read as one split button, as in the
@@ -388,4 +397,22 @@ a code {
 .bv-header__account > button.navbar__link svg {
   width: 18px;
   height: 18px;
+}
+
+/* Header menus (Tools): the chevron sits after the label and turns when the
+   menu opens, as in the shared header (.bv-header__link .bv-chevron). */
+.navbar__link .bv-chevron,
+.menu__link .bv-chevron {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--bv-fade) ease-out;
+}
+.bv-dropdown > button.navbar__link {
+  gap: var(--bv-space-1);
+  color: var(--bv-header-title);
+}
+/* The phone menu's Tools row: chevron at the far end, like Docusaurus's
+   collapsible rows. */
+.menu__link .bv-chevron {
+  margin-left: auto;
 }
