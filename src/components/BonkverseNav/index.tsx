@@ -4,6 +4,14 @@ import React, {useEffect, useRef, useState, type ReactNode} from 'react';
 import clsx from 'clsx';
 import {useColorMode} from '@docusaurus/theme-common';
 import nav from '@bonkverse/ui/nav.json';
+import {
+  addAccountHref,
+  getMe,
+  otherAccounts,
+  signInHref,
+  switchAccount,
+  type BonkverseMe,
+} from '@bonkverse/ui/account.mjs';
 import styles from './styles.module.css';
 
 const SITE = 'https://bonkverse.io';
@@ -173,9 +181,6 @@ export function AppearanceMenu({mobile}: ItemProps): ReactNode {
   );
 }
 
-/** Your bonkverse.io account (its session cookie covers .bonkverse.io). */
-type Account = {username: string; avatar: string | null};
-
 // Lucide's circle-user (ISC licence), shown under the skin picture and when
 // there is none, as in the shared header on the other sites.
 function UserIcon(): ReactNode {
@@ -197,50 +202,221 @@ function UserIcon(): ReactNode {
   );
 }
 
+// Lucide's chevron-down (ISC licence).
+function ChevronIcon(): ReactNode {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true">
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
+/** Their worn skin, as on bonkverse.io's header; the icon underneath shows
+ * if the picture can't load. */
+function Avatar({src}: {src: string | null}): ReactNode {
+  return src ? (
+    <span className={styles.avatar} style={{'--skin': `url("${src}")`} as React.CSSProperties} aria-hidden="true">
+      <UserIcon />
+    </span>
+  ) : (
+    <UserIcon />
+  );
+}
+
+/** The account menu's links from nav.json. Log out is a POST with
+ * bonkverse.io's CSRF token, so it stays on bonkverse.io's own menu. */
+function menuLinks(here: string): {label: string; href: string}[] {
+  return nav.account.items
+    .filter((item: {method?: string}) => item.method !== 'post')
+    .map((item: {label: string; href: string; id?: string}) => ({
+      label: item.label,
+      href: item.id === 'add-account' ? addAccountHref(here) : `${SITE}${item.href}`,
+    }));
+}
+
+/**
+ * The person's other bonk.io accounts (RFC-0003 phase 5). Those signed in on
+ * this browser switch in place: bonkverse.io's session covers this site too,
+ * so the page reloads as the new account. The others go to bonkverse.io's
+ * login with their name filled in.
+ */
+function Switcher({me, here, mobile}: {me: BonkverseMe; here: string; mobile?: boolean}): ReactNode {
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
+  const others = otherAccounts(me);
+  if (!others.length) return null;
+
+  const pick = async (id: number) => {
+    if (busy) return;
+    setBusy(true);
+    setMessage('');
+    const result = await switchAccount(id);
+    if (result.ok) {
+      window.location.reload();
+      return;
+    }
+    setBusy(false);
+    setMessage(result.message);
+  };
+
+  const itemClass = mobile ? clsx('menu__link', styles.mobileItem) : 'bv-menu__item';
+  const rows = others.map((account) => {
+    const label = (
+      <>
+        <UserIcon />
+        <span className="bv-menu__text">{account.username}</span>
+        {account.signed_in && !account.connected && (
+          <span className="bv-menu__badge" title="Wear will ask for this account's bonk.io password">
+            Not connected
+          </span>
+        )}
+        {!account.signed_in && <span className="bv-menu__badge">Sign in</span>}
+      </>
+    );
+    const row = account.signed_in ? (
+      <button className={itemClass} type="button" disabled={busy} onClick={() => pick(account.id)}>
+        {label}
+      </button>
+    ) : (
+      <a className={itemClass} href={signInHref(account.username, here)}>
+        {label}
+      </a>
+    );
+    return mobile ? (
+      <li className="menu__list-item" key={account.id}>
+        {row}
+      </li>
+    ) : (
+      <React.Fragment key={account.id}>{row}</React.Fragment>
+    );
+  });
+
+  const status = message ? (
+    <p className={clsx('bv-menu__label', mobile && styles.mobile)} role="status">
+      {message}
+    </p>
+  ) : null;
+
+  if (mobile) {
+    return (
+      <>
+        <li className={clsx('menu__list-item', 'bv-menu__label', styles.mobile)}>Switch account</li>
+        {rows}
+        {status && <li className="menu__list-item">{status}</li>}
+      </>
+    );
+  }
+  return (
+    <>
+      <div className="bv-menu__label">Switch account</div>
+      {rows}
+      {status}
+      <div className="bv-menu__divider" />
+    </>
+  );
+}
+
 /**
  * Your bonkverse.io account (its session cookie covers .bonkverse.io): your
- * name and worn skin from /api/me/, or Log in.
+ * name and worn skin from /api/me/ (Bonkverse/ui's account.mjs), and the
+ * account menu as on bonkverse.io and the replay site: your other bonk.io
+ * accounts to switch to, then My profile, Settings, API keys and Add
+ * account. Signed out: Log in.
  */
 export function AccountLink({mobile}: ItemProps): ReactNode {
-  const [account, setAccount] = useState<Account | null>(null);
+  const [me, setMe] = useState<BonkverseMe | null>(null);
   const [here, setHere] = useState('https://docs.bonkverse.io/');
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setHere(window.location.href);
     let live = true;
-    fetch(`${SITE}/api/me/`, {credentials: 'include'})
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (live && data?.authenticated) {
-          setAccount({username: data.user.username, avatar: data.user.avatar ?? null});
-        }
-      })
-      .catch(() => null); // signed out, offline or not allowed: show Log in
+    getMe().then((found) => live && setMe(found)); // null: signed out, offline or not allowed
     return () => {
       live = false;
     };
   }, []);
 
+  useEffect(() => {
+    if (!open) return undefined;
+    const onClick = (e: MouseEvent) => {
+      if (box.current && !box.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('click', onClick);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('click', onClick);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const account = me?.user ?? null;
   const href = account
     ? `${SITE}/player/${encodeURIComponent(account.username)}/`
     : `${SITE}${nav.account.signedOut.href}?next=${encodeURIComponent(here)}`;
   const link = (
-    <a className={clsx(mobile ? 'menu__link' : 'navbar__item navbar__link', account && styles.account)} href={href}>
-      {account &&
-        (account.avatar ? (
-          // Their worn skin, as on bonkverse.io's header; the icon underneath
-          // shows if the picture can't load.
-          <span
-            className={styles.avatar}
-            style={{'--skin': `url("${account.avatar}")`} as React.CSSProperties}
-            aria-hidden="true">
-            <UserIcon />
-          </span>
-        ) : (
-          <UserIcon />
-        ))}
+    <a className={clsx(mobile ? 'menu__link' : 'navbar__link', account && styles.account)} href={href}>
+      {account && <Avatar src={account.avatar} />}
       {account?.username ?? nav.account.signedOut.label}
     </a>
   );
-  return mobile ? <li className="menu__list-item">{link}</li> : link;
+
+  if (!account || !me) {
+    return mobile ? (
+      <li className="menu__list-item">{link}</li>
+    ) : (
+      <div className="navbar__item">{link}</div>
+    );
+  }
+
+  if (mobile) {
+    // The phone menu lists everything in place.
+    return (
+      <>
+        <li className="menu__list-item">{link}</li>
+        <Switcher me={me} here={here} mobile />
+        {menuLinks(here).map((item) => (
+          <li className="menu__list-item" key={item.href}>
+            <a className="menu__link" href={item.href}>
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </>
+    );
+  }
+
+  return (
+    <div className="navbar__item bv-dropdown bv-header__account" ref={box}>
+      {link}
+      <button
+        className="navbar__link"
+        type="button"
+        aria-label="Account menu"
+        aria-expanded={open}
+        aria-controls="bv-account"
+        onClick={() => setOpen(!open)}>
+        <ChevronIcon />
+      </button>
+      <div className="bv-menu bv-menu--end" id="bv-account" hidden={!open}>
+        <Switcher me={me} here={here} />
+        {menuLinks(here).map((item) => (
+          <a className="bv-menu__item" key={item.href} href={item.href}>
+            {item.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
 }
