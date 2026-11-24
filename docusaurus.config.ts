@@ -34,12 +34,14 @@ try {
 
 const headerItems: NavbarItem[] = nav.header.map((item): NavbarItem => {
   if ('items' in item && item.items) {
+    // Opens on click with the shared header's chevron and menu, not
+    // Docusaurus's hover dropdown (src/components/BonkverseNav NavMenu).
     return {
-      type: 'dropdown',
+      type: 'custom-bvMenu',
       label: item.label,
       position: 'left',
       items: item.items.map((sub) => ({label: sub.label, href: siteHref(sub.href)})),
-    };
+    } as NavbarItem;
   }
   if ('site' in item && item.site === THIS_SITE) {
     // This site's own item: highlighted on every docs page.
